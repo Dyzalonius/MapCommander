@@ -14,28 +14,24 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        UpdateMousePos();
+        mousePos = Cam.ScreenToWorldPoint(Input.mousePosition);
 
         if (Input.GetMouseButtonUp(1))
-            GiveUnitOrders();
+            GiveUnitOrders(Input.GetKey(KeyCode.LeftShift));
     }
 
-    private void UpdateMousePos()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit))
-            mousePos = hit.point;
-        else
-            mousePos = Vector3.zero;
-    }
-
-    private void GiveUnitOrders()
+    private void GiveUnitOrders(bool modifier)
     {
         if (Selection.Units.Count == 0 || mousePos == Vector3.zero)
             return;
-        
-        Selection.Units.ForEach(x => x.MoveTarget = mousePos);
+
+        // Give waypoint
+        Selection.Units.ForEach(x => {
+            // Remove existing waypoints if modifier is not pressed
+            if (!modifier)
+                x.Waypoints.Clear();
+
+            x.Waypoints.Enqueue(mousePos);
+        });
     }
 }

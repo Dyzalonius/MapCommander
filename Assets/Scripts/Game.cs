@@ -12,7 +12,7 @@ public class Game : MonoBehaviour
     private GameObject unitPrefab;
 
     [SerializeField]
-    private Terrain terrain;
+    private TerrainGrid terrain;
 
     [HideInInspector]
     public List<Unit> Units = new List<Unit>();
