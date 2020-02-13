@@ -12,6 +12,9 @@ public class Unit : MonoBehaviour
     public bool IsSelected;
 
     [HideInInspector]
+    public bool IsHovered;
+
+    [HideInInspector]
     public Queue<Vector3> Waypoints = new Queue<Vector3>();
 
     private void FixedUpdate()
@@ -54,5 +57,15 @@ public class Unit : MonoBehaviour
     public void Deselect()
     {
         IsSelected = false;
+    }
+
+    public void Hover()
+    {
+        IsHovered = true;
+    }
+
+    public void DeHover()
+    {
+        IsHovered = true;
     }
 }

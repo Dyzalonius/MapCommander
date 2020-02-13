@@ -168,7 +168,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &481440373
 GameObject:
@@ -218,7 +218,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &481440376
 MonoBehaviour:
@@ -237,6 +237,7 @@ MonoBehaviour:
   borderThickness: 2
   cam: {fileID: 519420031}
   Units: []
+  HoveredUnit: {fileID: 0}
 --- !u!114 &481440377
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -264,7 +265,6 @@ GameObject:
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
   - component: {fileID: 519420033}
-  - component: {fileID: 519420034}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -324,7 +324,7 @@ Camera:
   far clip plane: 20
   field of view: 60
   orthographic: 1
-  orthographic size: 500
+  orthographic size: 1000
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -348,7 +348,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 500, y: 10, z: 500}
+  m_LocalPosition: {x: 1800, y: 10, z: 1000}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -372,20 +372,12 @@ MonoBehaviour:
   gridCellSize: 100
   gridPadding: {x: 15, y: 30}
   gridLevelColors:
-  - {r: 0, g: 0, b: 0, a: 0.101960786}
+  - {r: 0, g: 0, b: 0, a: 0.2}
   - {r: 0, g: 0, b: 0, a: 1}
   gridLevelCameraScales:
   - 1000
   - 10000
   MapGridMarkerPositions:
-  - {x: -300, y: 0, z: -2.1474836e+9}
-  - {x: -300, y: 0, z: 2.1474836e+9}
-  - {x: -200, y: 0, z: -2.1474836e+9}
-  - {x: -200, y: 0, z: 2.1474836e+9}
-  - {x: -100, y: 0, z: -2.1474836e+9}
-  - {x: -100, y: 0, z: 2.1474836e+9}
-  - {x: 0, y: 0, z: -2.1474836e+9}
-  - {x: 0, y: 0, z: 2.1474836e+9}
   - {x: 100, y: 0, z: -2.1474836e+9}
   - {x: 100, y: 0, z: 2.1474836e+9}
   - {x: 200, y: 0, z: -2.1474836e+9}
@@ -412,6 +404,50 @@ MonoBehaviour:
   - {x: 1200, y: 0, z: 2.1474836e+9}
   - {x: 1300, y: 0, z: -2.1474836e+9}
   - {x: 1300, y: 0, z: 2.1474836e+9}
+  - {x: 1400, y: 0, z: -2.1474836e+9}
+  - {x: 1400, y: 0, z: 2.1474836e+9}
+  - {x: 1500, y: 0, z: -2.1474836e+9}
+  - {x: 1500, y: 0, z: 2.1474836e+9}
+  - {x: 1600, y: 0, z: -2.1474836e+9}
+  - {x: 1600, y: 0, z: 2.1474836e+9}
+  - {x: 1700, y: 0, z: -2.1474836e+9}
+  - {x: 1700, y: 0, z: 2.1474836e+9}
+  - {x: 1800, y: 0, z: -2.1474836e+9}
+  - {x: 1800, y: 0, z: 2.1474836e+9}
+  - {x: 1900, y: 0, z: -2.1474836e+9}
+  - {x: 1900, y: 0, z: 2.1474836e+9}
+  - {x: 2000, y: 0, z: -2.1474836e+9}
+  - {x: 2000, y: 0, z: 2.1474836e+9}
+  - {x: 2100, y: 0, z: -2.1474836e+9}
+  - {x: 2100, y: 0, z: 2.1474836e+9}
+  - {x: 2200, y: 0, z: -2.1474836e+9}
+  - {x: 2200, y: 0, z: 2.1474836e+9}
+  - {x: 2300, y: 0, z: -2.1474836e+9}
+  - {x: 2300, y: 0, z: 2.1474836e+9}
+  - {x: 2400, y: 0, z: -2.1474836e+9}
+  - {x: 2400, y: 0, z: 2.1474836e+9}
+  - {x: 2500, y: 0, z: -2.1474836e+9}
+  - {x: 2500, y: 0, z: 2.1474836e+9}
+  - {x: 2600, y: 0, z: -2.1474836e+9}
+  - {x: 2600, y: 0, z: 2.1474836e+9}
+  - {x: 2700, y: 0, z: -2.1474836e+9}
+  - {x: 2700, y: 0, z: 2.1474836e+9}
+  - {x: 2800, y: 0, z: -2.1474836e+9}
+  - {x: 2800, y: 0, z: 2.1474836e+9}
+  - {x: 2900, y: 0, z: -2.1474836e+9}
+  - {x: 2900, y: 0, z: 2.1474836e+9}
+  - {x: 3000, y: 0, z: -2.1474836e+9}
+  - {x: 3000, y: 0, z: 2.1474836e+9}
+  - {x: 3100, y: 0, z: -2.1474836e+9}
+  - {x: 3100, y: 0, z: 2.1474836e+9}
+  - {x: 3200, y: 0, z: -2.1474836e+9}
+  - {x: 3200, y: 0, z: 2.1474836e+9}
+  - {x: 3300, y: 0, z: -2.1474836e+9}
+  - {x: 3300, y: 0, z: 2.1474836e+9}
+  - {x: 3400, y: 0, z: -2.1474836e+9}
+  - {x: 3400, y: 0, z: 2.1474836e+9}
+  - {x: 3500, y: 0, z: -2.1474836e+9}
+  - {x: 3500, y: 0, z: 2.1474836e+9}
   - {x: -2.1474836e+9, y: 0, z: 100}
   - {x: 2.1474836e+9, y: 0, z: 100}
   - {x: -2.1474836e+9, y: 0, z: 200}
@@ -430,50 +466,27 @@ MonoBehaviour:
   - {x: 2.1474836e+9, y: 0, z: 800}
   - {x: -2.1474836e+9, y: 0, z: 900}
   - {x: 2.1474836e+9, y: 0, z: 900}
+  - {x: -2.1474836e+9, y: 0, z: 1000}
+  - {x: 2.1474836e+9, y: 0, z: 1000}
+  - {x: -2.1474836e+9, y: 0, z: 1100}
+  - {x: 2.1474836e+9, y: 0, z: 1100}
+  - {x: -2.1474836e+9, y: 0, z: 1200}
+  - {x: 2.1474836e+9, y: 0, z: 1200}
+  - {x: -2.1474836e+9, y: 0, z: 1300}
+  - {x: 2.1474836e+9, y: 0, z: 1300}
+  - {x: -2.1474836e+9, y: 0, z: 1400}
+  - {x: 2.1474836e+9, y: 0, z: 1400}
+  - {x: -2.1474836e+9, y: 0, z: 1500}
+  - {x: 2.1474836e+9, y: 0, z: 1500}
+  - {x: -2.1474836e+9, y: 0, z: 1600}
+  - {x: 2.1474836e+9, y: 0, z: 1600}
+  - {x: -2.1474836e+9, y: 0, z: 1700}
+  - {x: 2.1474836e+9, y: 0, z: 1700}
+  - {x: -2.1474836e+9, y: 0, z: 1800}
+  - {x: 2.1474836e+9, y: 0, z: 1800}
+  - {x: -2.1474836e+9, y: 0, z: 1900}
+  - {x: 2.1474836e+9, y: 0, z: 1900}
   SmallestGridLevel: 0
---- !u!114 &519420034
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 519420028}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca5e234ab9c69f845ae5197597d2c29c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  outputFolder: Assets/TerrainMaps
-  resolution: 1024
-  layer:
-    m_Bits: 4294967295
-  waterPlane: {fileID: 0}
-  noiseTex: {fileID: 2800000, guid: 17fd76d509b789648baafb7eb7d46609, type: 3}
-  renderHeight: 1
-  renderAlbedo: 1
-  renderNormals: 1
-  renderAmbientOcclusion: 1
-  renderCurvature: 0
-  renderFlow: 0
-  renderHillshade: 0
-  renderContour: 0
-  renderAspect: 0
-  renderShoreline: 0
-  renderSlope: 0
-  renderCam: {fileID: 519420031}
-  bounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
-  AlbedoTex: {fileID: 2800000, guid: 2a659efb8d75df545a0a486ec284ff02, type: 3}
-  HeightTex: {fileID: 2800000, guid: 632277b236748344b92bbedb6458bad2, type: 3}
-  NormalTex: {fileID: 2800000, guid: 2a659efb8d75df545a0a486ec284ff02, type: 3}
-  AmbientOcclusionTex: {fileID: 2800000, guid: 2a659efb8d75df545a0a486ec284ff02, type: 3}
-  CurvatureTex: {fileID: 2800000, guid: 2a659efb8d75df545a0a486ec284ff02, type: 3}
-  FlowTex: {fileID: 2800000, guid: 2a659efb8d75df545a0a486ec284ff02, type: 3}
-  ContourTex: {fileID: 2800000, guid: 2a659efb8d75df545a0a486ec284ff02, type: 3}
-  ShorelineTex: {fileID: 2800000, guid: 2a659efb8d75df545a0a486ec284ff02, type: 3}
-  SlopeTex: {fileID: 2800000, guid: 2a659efb8d75df545a0a486ec284ff02, type: 3}
-  previewTex: {fileID: 2800000, guid: 2a659efb8d75df545a0a486ec284ff02, type: 3}
 --- !u!1 &1395946607
 GameObject:
   m_ObjectHideFlags: 0
@@ -487,7 +500,7 @@ GameObject:
   - component: {fileID: 1395946609}
   - component: {fileID: 1395946608}
   m_Layer: 0
-  m_Name: Plane
+  m_Name: ContourMap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -560,13 +573,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1395946607}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2000, y: 1, z: 2000}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: 2000, y: 0, z: 2000}
   m_LocalScale: {x: 400, y: 1, z: 400}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &1422872707
 GameObject:
   m_ObjectHideFlags: 0
@@ -654,11 +667,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1422872707}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 50000, y: 0, z: 50000}
-  m_LocalScale: {x: 10000, y: 1, z: 10000}
+  m_LocalPosition: {x: 2000, y: 0, z: 2000}
+  m_LocalScale: {x: 400, y: 1, z: 400}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1578062413
 GameObject:
@@ -755,7 +768,7 @@ RectTransform:
   - {fileID: 2113013001}
   - {fileID: 2035509004}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -772,7 +785,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1763688407}
   - component: {fileID: 1763688408}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: UnitMarkers
   m_TagString: Untagged
   m_Icon: {fileID: 0}

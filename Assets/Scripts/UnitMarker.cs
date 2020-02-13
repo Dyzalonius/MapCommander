@@ -7,7 +7,10 @@ public class UnitMarker : MonoBehaviour
 {
     [Header("References")]
     [SerializeField]
-    private Image selectionMarker;
+    private Image onSelectedMarker;
+
+    [SerializeField]
+    private Image onHoverMarker;
 
     private Unit unit;
 
@@ -28,6 +31,7 @@ public class UnitMarker : MonoBehaviour
     private void UpdateMarker()
     {
         transform.position = Camera.main.WorldToScreenPoint(unit.transform.position);
-        selectionMarker.enabled = unit.IsSelected;
+        onSelectedMarker.enabled = unit.IsSelected;
+        onHoverMarker.enabled = unit.IsHovered;
     }
 }

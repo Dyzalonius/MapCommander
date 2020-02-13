@@ -19,6 +19,9 @@ public class Selection : MonoBehaviour
     [HideInInspector]
     public List<Unit> Units = new List<Unit>();
 
+    [HideInInspector]
+    public Unit HoveredUnit;
+
     private bool isSelecting = false;
     private Vector3 mousePosStart;
     private Texture2D whiteTexture; // Texture used for drawing rectangles
@@ -34,6 +37,8 @@ public class Selection : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
             StartSelection();
+
+        HandleHover();
 
         if (Input.GetMouseButtonUp(0))
             FinishSelection();
@@ -130,5 +135,32 @@ public class Selection : MonoBehaviour
         GUI.DrawTexture(new Rect(rect.xMax - borderThickness, rect.yMin, borderThickness, rect.height), whiteTexture); // Right
         GUI.DrawTexture(new Rect(rect.xMin, rect.yMax - borderThickness, rect.width, borderThickness), whiteTexture); // Bottom
         GUI.color = Color.white;
+    }
+
+    private void HandleHover()
+    {
+        Unit unitUnderMouse = null;
+
+        // Raycast on Unit layer to find unit
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 1000f, LayerMask.GetMask("Unit"))) //TODO: Make this actually find units
+        {
+            Unit potentialUnit = hit.collider.GetComponentInParent<Unit>();
+            if (potentialUnit != null && potentialUnit.enabled)
+                unitUnderMouse = potentialUnit;
+        }
+
+        // Update HoveredUnit if new
+        if (HoveredUnit != unitUnderMouse)
+        {
+            if (HoveredUnit)
+                HoveredUnit.DeHover();
+
+            HoveredUnit = unitUnderMouse;
+
+            if (HoveredUnit)
+                HoveredUnit.Hover();
+        }
     }
 }

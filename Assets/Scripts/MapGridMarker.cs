@@ -102,13 +102,4 @@ public class MapGridMarker : MonoBehaviour
         position.z = Mathf.Clamp(position.z, camMinima.z, camMaxima.z);
         return position;
     }
-
-    private void OnDrawGizmos()
-    {
-        if (text.enabled)
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawSphere(cam.ScreenToWorldPoint(transform.position), 1f);
-        }
-    }
 }

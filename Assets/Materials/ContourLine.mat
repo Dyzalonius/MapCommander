@@ -64,9 +64,11 @@ Material:
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _Height: 1000
-    - _Increment: 0.05
+    - _Increment: 0.01
+    - _LineGroupAmount: 3
     - _Metallic: 0
     - _Mode: 0
+    - _NeighborDistance: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _SmoothnessTextureChannel: 0
@@ -76,10 +78,12 @@ Material:
     - _Width: 1000
     - _ZWrite: 1
     m_Colors:
-    - _BackgroundColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BackgroundColor: {r: 1, g: 1, b: 1, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _KernelLine1: {r: 1, g: 1, b: 1, a: 1}
     - _KernelLine2: {r: 1, g: 1, b: 1, a: 1}
     - _KernelLine3: {r: 1, g: 1, b: 1, a: 1}
-    - _LineColor: {r: 0, g: 0, b: 0, a: 1}
+    - _LineColor: {r: 0.7019608, g: 0.7019608, b: 0.7019608, a: 1}
+    - _LineGroupColor: {r: 0.101960786, g: 0.101960786, b: 0.101960786, a: 1}
+    - _NonLineColor: {r: 1, g: 1, b: 1, a: 0}
