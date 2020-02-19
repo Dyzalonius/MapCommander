@@ -58,14 +58,4 @@ public class Unit : MonoBehaviour
     {
         IsSelected = false;
     }
-
-    public void Hover()
-    {
-        IsHovered = true;
-    }
-
-    public void DeHover()
-    {
-        IsHovered = true;
-    }
 }
