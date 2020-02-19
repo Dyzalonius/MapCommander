@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ContourLine
+  m_Name: Terrain
   m_Shader: {fileID: 4800000, guid: f045c541b5085fc44b9cb49578e26410, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -40,7 +40,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 671574ce3ee15594592fcb8ef78f5bc0, type: 3}
+        m_Texture: {fileID: 2800000, guid: 683dba7692dfb944e8f18c7c53efc1ea, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -65,7 +65,7 @@ Material:
     - _GlossyReflections: 1
     - _Height: 1000
     - _Increment: 0.01
-    - _LineGroupAmount: 3
+    - _LineGroupAmount: 5
     - _Metallic: 0
     - _Mode: 0
     - _NeighborDistance: 1
@@ -75,15 +75,20 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
+    - _WaterLevel: 0.1
     - _Width: 1000
     - _ZWrite: 1
     m_Colors:
     - _BackgroundColor: {r: 1, g: 1, b: 1, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _ForestColor: {r: 0.24256852, g: 0.6509434, b: 0.24256852, a: 1}
     - _KernelLine1: {r: 1, g: 1, b: 1, a: 1}
     - _KernelLine2: {r: 1, g: 1, b: 1, a: 1}
     - _KernelLine3: {r: 1, g: 1, b: 1, a: 1}
     - _LineColor: {r: 0.7019608, g: 0.7019608, b: 0.7019608, a: 1}
     - _LineGroupColor: {r: 0.101960786, g: 0.101960786, b: 0.101960786, a: 1}
-    - _NonLineColor: {r: 1, g: 1, b: 1, a: 0}
+    - _MajorLineColor: {r: 0, g: 0, b: 0, a: 1}
+    - _MinorLineColor: {r: 0.67, g: 0.67, b: 0.67, a: 1}
+    - _NonLineColor: {r: 0.85490197, g: 0.84705883, b: 0.8392157, a: 1}
+    - _WaterColor: {r: 0.14509805, g: 0.5411765, b: 0.882353, a: 1}
