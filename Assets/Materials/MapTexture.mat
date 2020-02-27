@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Terrain
-  m_Shader: {fileID: 4800000, guid: f045c541b5085fc44b9cb49578e26410, type: 3}
+  m_Name: MapTexture
+  m_Shader: {fileID: 10752, guid: 0000000000000000f000000000000000, type: 0}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -40,7 +40,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 683dba7692dfb944e8f18c7c53efc1ea, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -63,23 +63,33 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _Height: 1000
     - _Increment: 0.01
+    - _LineGroupAmount: 5
     - _MajorLineModulo: 5
     - _Metallic: 0
     - _Mode: 0
+    - _NeighborDistance: 1
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
-    - _WaterLevel: 0.1
+    - _WaterLevel: 0.13
+    - _Width: 1000
     - _ZWrite: 1
     m_Colors:
+    - _BackgroundColor: {r: 1, g: 1, b: 1, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _ForestColor: {r: 0.7960785, g: 0.8705883, b: 0.67058, a: 1}
-    - _MajorLineColor: {r: 0.7686275, g: 0.654902, b: 0.56862, a: 1}
-    - _MinorLineColor: {r: 0.86666673, g: 0.8117648, b: 0.76862, a: 1}
-    - _NonLineColor: {r: 0.96862745, g: 0.95686275, b: 0.9490196, a: 1}
-    - _WaterColor: {r: 0.7176471, g: 0.7960785, b: 0.90196, a: 1}
+    - _ForestColor: {r: 0.7960785, g: 0.8705883, b: 0.67058825, a: 1}
+    - _KernelLine1: {r: 1, g: 1, b: 1, a: 1}
+    - _KernelLine2: {r: 1, g: 1, b: 1, a: 1}
+    - _KernelLine3: {r: 1, g: 1, b: 1, a: 1}
+    - _LineColor: {r: 0.7019608, g: 0.7019608, b: 0.7019608, a: 1}
+    - _LineGroupColor: {r: 0.101960786, g: 0.101960786, b: 0.101960786, a: 1}
+    - _MajorLineColor: {r: 0.7686275, g: 0.654902, b: 0.5686275, a: 1}
+    - _MinorLineColor: {r: 0.86666673, g: 0.8117648, b: 0.7686275, a: 1}
+    - _NonLineColor: {r: 0.9686275, g: 0.9568628, b: 0.9490197, a: 1}
+    - _WaterColor: {r: 0.7176471, g: 0.7960785, b: 0.90196085, a: 1}
