@@ -40,23 +40,12 @@ public class MapGrid : MonoBehaviour
     private Vector2 camMinimaWithPadding;
     private Vector2 camMaximaWithPadding;
 
-    private void OnPostRender()
-    {
-        DrawGrid();
-    }
-
-    private void OnDrawGizmos()
-    {
-        DrawGrid();
-    }
-
-    private void DrawGrid()
+    public void DrawGrid()
     {
         FindCamMinimaMaxima();
         FindSmallestGridLevel();
         FindSmallestGridCellSize();
         MapGridMarkerPositions.Clear();
-        int lineCount = 0;
 
         // When adding to MapGridMarkerPositions, it always stores the 0,min; 0,max; min,0; max,0; startmin, 0;
 
@@ -66,7 +55,6 @@ public class MapGrid : MonoBehaviour
             Vector3 startPos = new Vector3(i, 0, camMinimaWithPadding.y);
             Vector3 endPos = new Vector3(i, 0, camMaximaWithPadding.y);
             DrawLine(startPos, endPos, color);
-            lineCount++;
             startPos.z = int.MinValue;
             endPos.z = int.MaxValue;
             MapGridMarkerPositions.Add(startPos);
@@ -79,7 +67,6 @@ public class MapGrid : MonoBehaviour
             Vector3 startPos = new Vector3(camMinimaWithPadding.x, 0, i);
             Vector3 endPos = new Vector3(camMaximaWithPadding.x, 0, i);
             DrawLine(startPos, endPos, color);
-            lineCount++;
             startPos.x = int.MinValue;
             endPos.x = int.MaxValue;
             MapGridMarkerPositions.Add(startPos);

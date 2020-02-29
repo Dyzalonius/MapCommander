@@ -214,8 +214,8 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
-  - component: {fileID: 519420033}
   - component: {fileID: 519420034}
+  - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -299,7 +299,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 1800, y: 10, z: 1000}
+  m_LocalPosition: {x: 1800, y: 10, z: 2000}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -345,8 +345,6 @@ MonoBehaviour:
   - {x: 4000, y: 0, z: 2.1474836e+9}
   - {x: 5000, y: 0, z: -2.1474836e+9}
   - {x: 5000, y: 0, z: 2.1474836e+9}
-  - {x: -2.1474836e+9, y: 0, z: -1000}
-  - {x: 2.1474836e+9, y: 0, z: -1000}
   - {x: -2.1474836e+9, y: 0, z: 0}
   - {x: 2.1474836e+9, y: 0, z: 0}
   - {x: -2.1474836e+9, y: 0, z: 1000}
@@ -355,6 +353,8 @@ MonoBehaviour:
   - {x: 2.1474836e+9, y: 0, z: 2000}
   - {x: -2.1474836e+9, y: 0, z: 3000}
   - {x: 2.1474836e+9, y: 0, z: 3000}
+  - {x: -2.1474836e+9, y: 0, z: 4000}
+  - {x: 2.1474836e+9, y: 0, z: 4000}
   SmallestGridLevel: 1
 --- !u!114 &519420034
 MonoBehaviour:
@@ -369,6 +369,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: 7c9af09fcbaeeba4081e5a5daf9c9f2a, type: 2}
+  mapGrid: {fileID: 519420033}
 --- !u!1 &1395946607
 GameObject:
   m_ObjectHideFlags: 0
@@ -759,7 +760,7 @@ GameObject:
   - component: {fileID: 2113013001}
   - component: {fileID: 2113013002}
   m_Layer: 5
-  m_Name: MapGridMarkers
+  m_Name: MapGrid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

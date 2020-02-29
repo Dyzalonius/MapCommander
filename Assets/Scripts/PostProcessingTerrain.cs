@@ -4,14 +4,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode, ImageEffectAllowedInSceneView]
+[ExecuteInEditMode]
 public class PostProcessingTerrain : MonoBehaviour
 {
 	[SerializeField]
 	private Material material;
 
+	[SerializeField]
+	private MapGrid mapGrid;
+
 	private void OnRenderImage(RenderTexture source, RenderTexture destination)
 	{
 		Graphics.Blit(source, destination, material);
+
+		mapGrid.DrawGrid();
 	}
 }
