@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Threading;
+using System;
 
 public class TerrainGenerator : MonoBehaviour
 {
@@ -37,14 +39,25 @@ public class TerrainGenerator : MonoBehaviour
     [SerializeField]
     private TerrainTexture terrain;
 
+    private float[,] noiseMap;
+
     private void Start()
     {
-        Generate();
+        //Generate();
     }
 
     public void Generate()
     {
-        float[,] noiseMap = Noise.GenerateNoiseMap(terrainSize, seed, noiseScale, octaves, persistance, lacunarity, offset);
+        StartCoroutine(Threaded.RunOnThread(GenerateNoiseMap, DrawNoiseMap));
+    }
+
+    private void GenerateNoiseMap()
+    {
+        noiseMap = Noise.GenerateNoiseMap(terrainSize, seed, noiseScale, octaves, persistance, lacunarity, offset);
+    }
+
+    private void DrawNoiseMap()
+    {
         terrain.DrawNoiseMap(noiseMap);
     }
 
