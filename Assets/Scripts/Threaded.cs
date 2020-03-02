@@ -8,7 +8,6 @@ public static class Threaded
     public static IEnumerator RunOnThread(Action toRun, Action callback)
     {
         bool done = false;
-        Debug.Log(Time.realtimeSinceStartup + " - START");
 
         // Run toRun, set done to true when finished
         new Thread(() => {
@@ -20,11 +19,7 @@ public static class Threaded
         while (!done)
             yield return null;
 
-        Debug.Log(Time.realtimeSinceStartup + " - MIDDLE");
-
         // Run callback
         callback();
-
-        Debug.Log(Time.realtimeSinceStartup + " - END");
     }
 }
