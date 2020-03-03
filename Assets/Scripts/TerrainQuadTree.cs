@@ -5,45 +5,74 @@ using System;
 
 public class TerrainQuadTree : MonoBehaviour
 {
-    private Rect bounds;
+    [SerializeField]
+    private Vector2Int position;
+
+    [SerializeField]
+    private QuadrantSize minSize;
+
+    [SerializeField]
+    private QuadrantSize maxSize;
+
+    [SerializeField]
+    private TerrainTexture2 terrainPlanePrefab;
+
     private Quadrant root;
-    private int maxDepth;
+    private List<Quadrant> activeQuadrants;
+    private Dictionary<TerrainTexture2, Quadrant> quadrantPairs;
 
-    public TerrainQuadTree()
+    private void Start()
     {
-
+        BuildTree();
+        GenerateTerrain();
+        activeQuadrants = new List<Quadrant> { root };
+        quadrantPairs = new Dictionary<TerrainTexture2, Quadrant>();
     }
 
-    internal class Quadrant
+    private void BuildTree()
     {
-        private Rect bounds;
-        private Quadrant parent;
-        private int depth;
+        root = new Quadrant(maxSize, minSize, Vector2Int.zero, position);
+    }
 
-        private Quadrant topLeft;
-        private Quadrant topRight;
-        private Quadrant bottomLeft;
-        private Quadrant bottomRight;
+    private void GenerateTerrain()
+    {
+        StartCoroutine(Threaded.RunOnThread(CreateTerrainData, DrawTerrain));
+    }
 
-        private Texture2D texture; // Store mapData here in a texture of 1000x1000
+    private void CreateTerrainData()
+    {
+        root.GenerateNoiseMap();
+    }
 
-        public Quadrant()
+    private void DrawTerrain()
+    {
+        foreach (Quadrant quadrant in activeQuadrants)
         {
-            //if (true)
-            //    Split();
-        }
-
-        private void Split()
-        {
-            topLeft = new Quadrant();
-            topRight = new Quadrant();
-            bottomLeft = new Quadrant();
-            bottomRight = new Quadrant();
+            TerrainTexture2 newTerrainTexture = Instantiate(terrainPlanePrefab, transform);
+            newTerrainTexture.Setup(quadrant);
+            quadrantPairs.Add(newTerrainTexture, quadrant);
         }
     }
 
-    public void BuildTree()
+    void OnDrawGizmos()
     {
-        //root = new
+        List<Quadrant> quadrants = root.GetQuadrants();
+        quadrants.ForEach(x => DrawGizmoThing(x.position, x.size));
     }
+
+    private void DrawGizmoThing(Vector2Int position, Vector2Int size)
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireCube(new Vector3(position.x + size.x / 2, 0f, position.y + size.y / 2), new Vector3(size.x, 0f, size.y));
+    }
+}
+
+public enum QuadrantSize
+{
+    k4 = 4096,
+    k8 = 8192,
+    k16 = 16384,
+    k32 = 32768,
+    k64 = 65536,
+    k128 = 131072
 }
