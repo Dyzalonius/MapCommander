@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class Quadrant
 {
     public Vector2Int position;
-    public Vector2Int size;
+    public Vector2Int size; // Size of the quadrant, not size of the texture
     private Quadrant parent;
     private int depth;
 
@@ -16,16 +17,19 @@ public class Quadrant
     private Quadrant bottomRight;
 
     public Texture2D texture; // Map data texture
+    public int textureSize = (int)QuadrantSize.k4;
 
     private float[,] noiseMap;
+    private Color[] colorMap;
 
     public Quadrant(QuadrantSize size, QuadrantSize minSize, Vector2Int offset, Vector2Int position)
     {
         this.position = position;
         this.size = new Vector2Int((int)size, (int)size);
+        Debug.Log("Size = " + this.size);
 
         if ((int)size > (int)minSize)
-            Split(NextSize(size), minSize);
+            Split(NextSize(size, false), minSize);
     }
 
     public Quadrant(QuadrantSize size, QuadrantSize minSize, Vector2Int offset, Quadrant parent)
@@ -35,7 +39,7 @@ public class Quadrant
         this.size = new Vector2Int((int)size, (int)size);
 
         if ((int)size > (int)minSize)
-            Split(NextSize(size), minSize);
+            Split(NextSize(size, false), minSize);
     }
 
     // Create four new Quadrants inside current Quadrant
@@ -47,41 +51,138 @@ public class Quadrant
         bottomRight = new Quadrant(size, minSize, Vector2Int.right, this);
     }
 
-    public List<Quadrant> GetQuadrants()
+    public List<Quadrant> GetQuadrants(bool recursive)
     {
         List<Quadrant> quadrants = new List<Quadrant>();
 
-        quadrants.Add(this);
-        if (topLeft != null)
-            quadrants.AddRange(topLeft.GetQuadrants());
-        if (topRight != null)
-            quadrants.AddRange(topRight.GetQuadrants());
-        if (bottomLeft != null)
-            quadrants.AddRange(bottomLeft.GetQuadrants());
-        if (bottomRight != null)
-            quadrants.AddRange(bottomRight.GetQuadrants());
+        if (recursive)
+        {
+            quadrants.Add(this);
+            if (topLeft != null)
+                quadrants.AddRange(topLeft.GetQuadrants(recursive));
+            if (topRight != null)
+                quadrants.AddRange(topRight.GetQuadrants(recursive));
+            if (bottomLeft != null)
+                quadrants.AddRange(bottomLeft.GetQuadrants(recursive));
+            if (bottomRight != null)
+                quadrants.AddRange(bottomRight.GetQuadrants(recursive));
+        }
+        else
+        {
+            quadrants.Add(topLeft);
+            quadrants.Add(topRight);
+            quadrants.Add(bottomLeft);
+            quadrants.Add(bottomRight);
+        }
 
         return quadrants;
     }
 
-    public void GenerateNoiseMap()
+    public List<Quadrant> GetLeafQuadrants()
     {
-        noiseMap = Noise.GenerateNoiseMap(new Vector2Int((int)QuadrantSize.k4, (int)QuadrantSize.k4), 0, 0, 1, 0.5f, 1, Vector2.zero);
+        List<Quadrant> leaves = new List<Quadrant>();
 
+        // If quadrant has children, add leafquadrants of children
         if (topLeft != null)
-            topLeft.GenerateNoiseMap();
+            leaves.AddRange(topLeft.GetLeafQuadrants());
         if (topRight != null)
-            topRight.GenerateNoiseMap();
+            leaves.AddRange(topRight.GetLeafQuadrants());
         if (bottomLeft != null)
-            bottomLeft.GenerateNoiseMap();
+            leaves.AddRange(bottomLeft.GetLeafQuadrants());
         if (bottomRight != null)
-            bottomRight.GenerateNoiseMap();
+            leaves.AddRange(bottomRight.GetLeafQuadrants());
+
+        // If quadrant has no children, this quadrant is a leaf
+        if (leaves.Count == 0)
+            leaves.Add(this);
+
+        return leaves;
     }
 
-    // Grab next smallest size from QuadrantSize enum
-    private QuadrantSize NextSize(QuadrantSize size)
+    public List<Quadrant> FindQuadrantsOfSize(QuadrantSize size)
+    {
+        List<Quadrant> quadrantsOfSize = new List<Quadrant>();
+
+        if (this.size.x == (int)size)
+            quadrantsOfSize.Add(this);
+        else
+        {
+            if (topLeft != null)
+                quadrantsOfSize.AddRange(topLeft.FindQuadrantsOfSize(size));
+            if (topRight != null)
+                quadrantsOfSize.AddRange(topRight.FindQuadrantsOfSize(size));
+            if (bottomLeft != null)
+                quadrantsOfSize.AddRange(bottomLeft.FindQuadrantsOfSize(size));
+            if (bottomRight != null)
+                quadrantsOfSize.AddRange(bottomRight.FindQuadrantsOfSize(size));
+        }
+
+        return quadrantsOfSize;
+    }
+
+    public void GenerateTerrainData()
+    {
+        // Create noise map
+        noiseMap = Noise.GenerateNoiseMap(new Vector2Int(textureSize, textureSize), 0, 300, 1, 0.5f, 1, Vector2.zero);
+
+        // Create color map
+        colorMap = new Color[noiseMap.Length];
+        for (int y = 0; y < textureSize; y++)
+            for (int x = 0; x < textureSize; x++)
+            {
+                if (x * y > noiseMap.Length)
+                    Debug.Log(x + " * " + y + " = " + (x * y));
+                colorMap[y * textureSize + x] = new Color(noiseMap[x, y], 0f, 0f);
+            }
+
+        if (topLeft != null)
+            topLeft.GenerateTerrainData();
+        if (topRight != null)
+            topRight.GenerateTerrainData();
+        if (bottomLeft != null)
+            bottomLeft.GenerateTerrainData();
+        if (bottomRight != null)
+            bottomRight.GenerateTerrainData();
+    }
+
+    public void GenerateTerrainTexture()
+    {
+        texture = new Texture2D(textureSize, textureSize)
+        {
+            filterMode = FilterMode.Point,
+            wrapMode = TextureWrapMode.Clamp
+        };
+        texture.SetPixels(colorMap);
+        texture.Apply();
+
+        if (topLeft != null)
+            topLeft.GenerateTerrainTexture();
+        if (topRight != null)
+            topRight.GenerateTerrainTexture();
+        if (bottomLeft != null)
+            bottomLeft.GenerateTerrainTexture();
+        if (bottomRight != null)
+            bottomRight.GenerateTerrainTexture();
+    }
+
+    // Grab next size from QuadrantSize enum
+    private QuadrantSize NextSize(QuadrantSize size, bool nextRatherThanPrevious = true)
     {
         QuadrantSize[] list = (QuadrantSize[])Enum.GetValues(typeof(QuadrantSize));
-        return list[Array.IndexOf<QuadrantSize>(list, size) - 1];
+        if (nextRatherThanPrevious)
+            return list[Array.IndexOf<QuadrantSize>(list, size) + 1];
+        else
+            return list[Array.IndexOf<QuadrantSize>(list, size) - 1];
+    }
+
+    public void SaveTexture()
+    {
+        byte[] bytes = texture.EncodeToPNG();
+        var dirPath = Application.dataPath + "/../SaveImages/";
+
+        if (!Directory.Exists(dirPath))
+            Directory.CreateDirectory(dirPath);
+
+        File.WriteAllBytes(dirPath + "Image" + ".png", bytes);
     }
 }
