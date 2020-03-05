@@ -122,7 +122,7 @@ public class Quadrant
 
     public void GenerateTerrainData()
     {
-        // Create noise map
+        /*// Create noise map
         noiseMap = Noise.GenerateNoiseMap(new Vector2Int(textureSize, textureSize), 0, 300, 1, 0.5f, 1, Vector2.zero);
 
         // Create color map
@@ -133,7 +133,7 @@ public class Quadrant
                 if (x * y > noiseMap.Length)
                     Debug.Log(x + " * " + y + " = " + (x * y));
                 colorMap[y * textureSize + x] = new Color(noiseMap[x, y], 0f, 0f);
-            }
+            }*/
 
         if (topLeft != null)
             topLeft.GenerateTerrainData();
@@ -147,13 +147,13 @@ public class Quadrant
 
     public void GenerateTerrainTexture()
     {
-        texture = new Texture2D(textureSize, textureSize)
+        /*texture = new Texture2D(textureSize, textureSize)
         {
             filterMode = FilterMode.Point,
             wrapMode = TextureWrapMode.Clamp
         };
         texture.SetPixels(colorMap);
-        texture.Apply();
+        texture.Apply();*/
 
         if (topLeft != null)
             topLeft.GenerateTerrainTexture();
@@ -184,5 +184,13 @@ public class Quadrant
             Directory.CreateDirectory(dirPath);
 
         File.WriteAllBytes(dirPath + "Image" + ".png", bytes);
+    }
+
+    public bool VisibleByMainCam()
+    {
+        Vector3 bottomLeftPos = Camera.main.WorldToViewportPoint(new Vector3(position.x, 0f, position.y));
+        Vector3 topRightPos = Camera.main.WorldToViewportPoint(new Vector3(position.x + size.x, 0f, position.y + size.y));
+
+        return !(bottomLeftPos.x > 1f || topRightPos.x < 0f || bottomLeftPos.y > 1f || topRightPos.y < 0f);
     }
 }

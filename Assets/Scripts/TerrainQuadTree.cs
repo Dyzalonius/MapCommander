@@ -6,6 +6,7 @@ using System.Linq;
 
 public class TerrainQuadTree : MonoBehaviour
 {
+    [Header("Settings")]
     [SerializeField]
     private Vector2Int position;
 
@@ -15,94 +16,92 @@ public class TerrainQuadTree : MonoBehaviour
     [SerializeField]
     private QuadrantSize maxSize;
 
+    [Header("References")]
     [SerializeField]
-    private TerrainTexture2 terrainPlanePrefab;
+    private TerrainTexture terrainPlanePrefab;
+
+    [HideInInspector]
+    public static TerrainQuadTree Instance { get; private set; } // static singleton
 
     private Quadrant root;
     private List<Quadrant> activeQuadrants;
-    private Dictionary<TerrainTexture2, Quadrant> quadrantPairs;
+    private Dictionary<TerrainTexture, Quadrant> activeQuadrantPairs;
     private QuadrantSize activeQuadrantScale;
 
     private void Start()
     {
+        activeQuadrants = new List<Quadrant>();
+        activeQuadrantPairs = new Dictionary<TerrainTexture, Quadrant>();
+        activeQuadrantScale = maxSize;
         BuildTree();
         GenerateTerrain();
-        activeQuadrants = new List<Quadrant> { root };
-        quadrantPairs = new Dictionary<TerrainTexture2, Quadrant>();
-        activeQuadrantScale = maxSize;
+    }
+
+    public void BuildTree()
+    {
+        root = new Quadrant(maxSize, minSize, Vector2Int.zero, position);
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            activeQuadrantScale = QuadrantSize.k4;
-            List<Quadrant> newActive = new List<Quadrant>();
-            newActive.AddRange(root.GetQuadrants(false));
-
-            foreach (var pair in quadrantPairs)
-                Destroy(pair.Key.gameObject);
-
-            activeQuadrants = newActive;
-            foreach (Quadrant quadrant in activeQuadrants)
-            {
-                TerrainTexture2 newTerrainTexture = Instantiate(terrainPlanePrefab, transform);
-                newTerrainTexture.Setup(quadrant);
-                quadrantPairs.Add(newTerrainTexture, quadrant);
-            }
-        }
+        UpdateTerrainScale();
 
         if (Input.GetKeyDown(KeyCode.S))
-        {
-            List<Quadrant> leaves = root.GetLeafQuadrants();
+            SaveTerrain();
+    }
 
-            foreach (Quadrant quadrant in leaves)
-                quadrant.SaveTexture();
-        }
-
+    private void UpdateTerrainScale()
+    {
         float pos1 = Camera.main.ScreenToWorldPoint(Vector3.zero).x;
         float pos2 = Camera.main.ScreenToWorldPoint(new Vector3(Camera.main.scaledPixelWidth, 0f, 0f)).x;
         float metersPerPixel = (pos2 - pos1) / Camera.main.scaledPixelWidth;
         float texelsPerMeter = (int)QuadrantSize.k4 / ((float)activeQuadrantScale);
         float texelsPerPixel = metersPerPixel * texelsPerMeter;
-        Debug.Log("mpp = " + metersPerPixel + ", tpm = " + texelsPerMeter + ", tpp = " + texelsPerPixel);
+        //Debug.Log("tpp = " + texelsPerPixel);
 
-        // Decrease detail when zooming out
+        // Decrease activeQuadrantScale when zooming out
         if (texelsPerPixel >= 2f && activeQuadrantScale != maxSize)
-        {
             activeQuadrantScale = NextSize(activeQuadrantScale, true);
-            UpdateActiveQuadrants();
-        }
 
-        // Increase detail when zooming in
+        // Increase activeQuadrantScale when zooming in
         if (texelsPerPixel < 1f && activeQuadrantScale != minSize)
-        {
             activeQuadrantScale = NextSize(activeQuadrantScale, false);
+
+        // Update activeQuadrants if a different set
+        List<Quadrant> newActiveQuadrants = new List<Quadrant>();
+        foreach (Quadrant quadrant in root.FindQuadrantsOfSize(activeQuadrantScale))
+            if (quadrant.VisibleByMainCam())
+                newActiveQuadrants.Add(quadrant);
+
+        if (!newActiveQuadrants.Equals(activeQuadrants))
+        {
+            activeQuadrants = newActiveQuadrants;
             UpdateActiveQuadrants();
         }
     }
 
-    private void UpdateActiveQuadrants()
+    private void UpdateActiveQuadrants() //TODO: optimize: Only delete quadrants that are now inactive, and create quadrants that we're inactive, and pool the TerrainTexture objects
     {
-        List<Quadrant> newActive = new List<Quadrant>();
-        newActive.AddRange(root.FindQuadrantsOfSize(activeQuadrantScale));
-
-        foreach (var pair in quadrantPairs)
+        // Delete old activeQuadrants
+        foreach (var pair in activeQuadrantPairs)
             Destroy(pair.Key.gameObject);
+        activeQuadrantPairs.Clear();
 
-        quadrantPairs.Clear();
-        activeQuadrants = newActive;
+        // Create new activeQuadrants
         foreach (Quadrant quadrant in activeQuadrants)
         {
-            TerrainTexture2 newTerrainTexture = Instantiate(terrainPlanePrefab, transform);
+            TerrainTexture newTerrainTexture = Instantiate(terrainPlanePrefab, transform);
             newTerrainTexture.Setup(quadrant);
-            quadrantPairs.Add(newTerrainTexture, quadrant);
+            activeQuadrantPairs.Add(newTerrainTexture, quadrant);
         }
     }
 
-    private void BuildTree()
+    private void SaveTerrain()
     {
-        root = new Quadrant(maxSize, minSize, Vector2Int.zero, position);
+        List<Quadrant> leaves = root.GetLeafQuadrants();
+
+        foreach (Quadrant quadrant in leaves)
+            quadrant.SaveTexture();
     }
 
     private void GenerateTerrain()
@@ -118,13 +117,16 @@ public class TerrainQuadTree : MonoBehaviour
     private void DrawTerrain()
     {
         root.GenerateTerrainTexture();
-        UpdateActiveQuadrants();
     }
 
     void OnDrawGizmos()
     {
-        List<Quadrant> quadrants = root.GetQuadrants(true);
-        quadrants.ForEach(x => DrawGizmoThing(x.position, x.size));
+        if (activeQuadrantPairs == null) return;
+
+        foreach (var pair in activeQuadrantPairs)
+        {
+            DrawGizmoThing(pair.Value.position, pair.Value.size);
+        }
     }
 
     private void DrawGizmoThing(Vector2Int position, Vector2Int size)

@@ -33,7 +33,11 @@ public class Game : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.N))
         {
+            Vector3 newPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            newPos.y = 0;
+
             Unit newUnit = Instantiate(unitPrefab, transform).GetComponent<Unit>();
+            newUnit.transform.localPosition = newPos;
             Units.Add(newUnit);
         }
     }
