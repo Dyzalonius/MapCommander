@@ -22,7 +22,7 @@ public class Quadrant
     private float[,] noiseMap;
     private Color[] colorMap;
 
-    public Quadrant(QuadrantSize size, QuadrantSize minSize, Vector2Int offset, Vector2Int position)
+    public Quadrant(QuadrantSize size, QuadrantSize minSize, Vector2Int position)
     {
         this.position = position;
         this.size = new Vector2Int((int)size, (int)size);
@@ -120,49 +120,58 @@ public class Quadrant
         return quadrantsOfSize;
     }
 
-    public void GenerateTerrainData()
+    public void GenerateTerrainData(bool generate)
     {
-        /*// Create noise map
-        noiseMap = Noise.GenerateNoiseMap(new Vector2Int(textureSize, textureSize), 0, 300, 1, 0.5f, 1, Vector2.zero);
+        // Create noise map
+        if (generate)
+        {
+            noiseMap = Noise.GenerateNoiseMap(new Vector2Int(textureSize, textureSize), 0, 300, 1, 0.5f, 1, Vector2.zero);
 
-        // Create color map
-        colorMap = new Color[noiseMap.Length];
-        for (int y = 0; y < textureSize; y++)
-            for (int x = 0; x < textureSize; x++)
-            {
-                if (x * y > noiseMap.Length)
-                    Debug.Log(x + " * " + y + " = " + (x * y));
-                colorMap[y * textureSize + x] = new Color(noiseMap[x, y], 0f, 0f);
-            }*/
+            // Create color map
+            colorMap = new Color[noiseMap.Length];
+            for (int y = 0; y < textureSize; y++)
+                for (int x = 0; x < textureSize; x++)
+                {
+                    if (x * y > noiseMap.Length)
+                        Debug.Log(x + " * " + y + " = " + (x * y));
+                    colorMap[y * textureSize + x] = new Color(noiseMap[x, y], 0f, 0f);
+                }
+        }
 
         if (topLeft != null)
-            topLeft.GenerateTerrainData();
+            topLeft.GenerateTerrainData(generate);
         if (topRight != null)
-            topRight.GenerateTerrainData();
+            topRight.GenerateTerrainData(generate);
         if (bottomLeft != null)
-            bottomLeft.GenerateTerrainData();
+            bottomLeft.GenerateTerrainData(generate);
         if (bottomRight != null)
-            bottomRight.GenerateTerrainData();
+            bottomRight.GenerateTerrainData(generate);
+        Debug.Log("generated");
     }
 
-    public void GenerateTerrainTexture()
+    public void GenerateTerrainTexture(bool generate)
     {
-        /*texture = new Texture2D(textureSize, textureSize)
+        if (generate)
         {
-            filterMode = FilterMode.Point,
-            wrapMode = TextureWrapMode.Clamp
-        };
-        texture.SetPixels(colorMap);
-        texture.Apply();*/
+            texture = new Texture2D(textureSize, textureSize)
+            {
+                filterMode = FilterMode.Point,
+                wrapMode = TextureWrapMode.Clamp
+            };
+            texture.SetPixels(colorMap);
+            texture.Apply();
+        }
 
         if (topLeft != null)
-            topLeft.GenerateTerrainTexture();
+            topLeft.GenerateTerrainTexture(generate);
         if (topRight != null)
-            topRight.GenerateTerrainTexture();
+            topRight.GenerateTerrainTexture(generate);
         if (bottomLeft != null)
-            bottomLeft.GenerateTerrainTexture();
+            bottomLeft.GenerateTerrainTexture(generate);
         if (bottomRight != null)
-            bottomRight.GenerateTerrainTexture();
+            bottomRight.GenerateTerrainTexture(generate);
+
+        Debug.Log("applied");
     }
 
     // Grab next size from QuadrantSize enum

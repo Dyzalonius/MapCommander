@@ -16,6 +16,8 @@ public class TerrainQuadTree : MonoBehaviour
     [SerializeField]
     private QuadrantSize maxSize;
 
+    public bool GenerateMapData;
+
     [Header("References")]
     [SerializeField]
     private TerrainTexture terrainPlanePrefab;
@@ -24,76 +26,89 @@ public class TerrainQuadTree : MonoBehaviour
     public static TerrainQuadTree Instance { get; private set; } // static singleton
 
     private Quadrant root;
-    private List<Quadrant> activeQuadrants;
-    private Dictionary<TerrainTexture, Quadrant> activeQuadrantPairs;
-    private QuadrantSize activeQuadrantScale;
+    private List<Quadrant> visibleQuadrants;
+    private List<TerrainTexture> terrainTexturePool;
+    private Dictionary<Quadrant, TerrainTexture> visibleQuadrantPairs;
+    private QuadrantSize visibleQuadrantScale;
 
     private void Start()
     {
-        activeQuadrants = new List<Quadrant>();
-        activeQuadrantPairs = new Dictionary<TerrainTexture, Quadrant>();
-        activeQuadrantScale = maxSize;
+        visibleQuadrants = new List<Quadrant>();
+        terrainTexturePool = new List<TerrainTexture>();
+        visibleQuadrantPairs = new Dictionary<Quadrant, TerrainTexture>();
+        visibleQuadrantScale = maxSize;
         BuildTree();
-        GenerateTerrain();
-    }
-
-    public void BuildTree()
-    {
-        root = new Quadrant(maxSize, minSize, Vector2Int.zero, position);
     }
 
     private void Update()
     {
-        UpdateTerrainScale();
+        UpdateVisibleQuadrantScale();
+        UpdateVisibleQuadrants();
 
         if (Input.GetKeyDown(KeyCode.S))
             SaveTerrain();
     }
 
-    private void UpdateTerrainScale()
+    public void BuildTree()
+    {
+        root = new Quadrant(maxSize, minSize, position);
+        StartCoroutine(Threaded.RunOnThread(CreateTerrainData, DrawTerrain));
+    }
+
+    private void UpdateVisibleQuadrantScale()
     {
         float pos1 = Camera.main.ScreenToWorldPoint(Vector3.zero).x;
         float pos2 = Camera.main.ScreenToWorldPoint(new Vector3(Camera.main.scaledPixelWidth, 0f, 0f)).x;
         float metersPerPixel = (pos2 - pos1) / Camera.main.scaledPixelWidth;
-        float texelsPerMeter = (int)QuadrantSize.k4 / ((float)activeQuadrantScale);
+        float texelsPerMeter = (int)QuadrantSize.k4 / ((float)visibleQuadrantScale);
         float texelsPerPixel = metersPerPixel * texelsPerMeter;
         //Debug.Log("tpp = " + texelsPerPixel);
 
         // Decrease activeQuadrantScale when zooming out
-        if (texelsPerPixel >= 2f && activeQuadrantScale != maxSize)
-            activeQuadrantScale = NextSize(activeQuadrantScale, true);
+        if (texelsPerPixel >= 2f && visibleQuadrantScale != maxSize)
+            visibleQuadrantScale = NextSize(visibleQuadrantScale, true);
 
         // Increase activeQuadrantScale when zooming in
-        if (texelsPerPixel < 1f && activeQuadrantScale != minSize)
-            activeQuadrantScale = NextSize(activeQuadrantScale, false);
+        if (texelsPerPixel < 1f && visibleQuadrantScale != minSize)
+            visibleQuadrantScale = NextSize(visibleQuadrantScale, false);
+    }
 
-        // Update activeQuadrants if a different set
+    private void UpdateVisibleQuadrants()
+    {
+        // Find quadrants that have to be visible
         List<Quadrant> newActiveQuadrants = new List<Quadrant>();
-        foreach (Quadrant quadrant in root.FindQuadrantsOfSize(activeQuadrantScale))
+        foreach (Quadrant quadrant in root.FindQuadrantsOfSize(visibleQuadrantScale))
             if (quadrant.VisibleByMainCam())
                 newActiveQuadrants.Add(quadrant);
 
-        if (!newActiveQuadrants.Equals(activeQuadrants))
+        // Deactivate visible quadrants that have to be invisible
+        for (int i = visibleQuadrants.Count - 1; i >= 0; i--)
         {
-            activeQuadrants = newActiveQuadrants;
-            UpdateActiveQuadrants();
+            Quadrant quadrant = visibleQuadrants[i];
+            if (!newActiveQuadrants.Contains(quadrant))
+            {
+                TerrainTexture terrainTexture = visibleQuadrantPairs[quadrant];
+                terrainTexture.Deactivate();
+                visibleQuadrantPairs.Remove(quadrant);
+                terrainTexturePool.Add(terrainTexture);
+            }
         }
-    }
 
-    private void UpdateActiveQuadrants() //TODO: optimize: Only delete quadrants that are now inactive, and create quadrants that we're inactive, and pool the TerrainTexture objects
-    {
-        // Delete old activeQuadrants
-        foreach (var pair in activeQuadrantPairs)
-            Destroy(pair.Key.gameObject);
-        activeQuadrantPairs.Clear();
+        // Activate new visible quadrants
+        visibleQuadrants = newActiveQuadrants;
+        foreach (Quadrant quadrant in visibleQuadrants)
+            if (!visibleQuadrantPairs.ContainsKey(quadrant))
+            {
+                // Only instantiate a new terrainTexture if the pool is empty
+                if (terrainTexturePool.Count == 0)
+                    terrainTexturePool.Add(Instantiate(terrainPlanePrefab, transform));
 
-        // Create new activeQuadrants
-        foreach (Quadrant quadrant in activeQuadrants)
-        {
-            TerrainTexture newTerrainTexture = Instantiate(terrainPlanePrefab, transform);
-            newTerrainTexture.Setup(quadrant);
-            activeQuadrantPairs.Add(newTerrainTexture, quadrant);
-        }
+                TerrainTexture terrainTexture = terrainTexturePool[0];
+                terrainTexturePool.Remove(terrainTexture);
+                terrainTexture.gameObject.SetActive(true);
+                terrainTexture.Setup(quadrant, GenerateMapData);
+                visibleQuadrantPairs.Add(quadrant, terrainTexture);
+            }
     }
 
     private void SaveTerrain()
@@ -104,35 +119,14 @@ public class TerrainQuadTree : MonoBehaviour
             quadrant.SaveTexture();
     }
 
-    private void GenerateTerrain()
-    {
-        StartCoroutine(Threaded.RunOnThread(CreateTerrainData, DrawTerrain));
-    }
-
     private void CreateTerrainData()
     {
-        root.GenerateTerrainData();
+        root.GenerateTerrainData(GenerateMapData);
     }
 
     private void DrawTerrain()
     {
-        root.GenerateTerrainTexture();
-    }
-
-    void OnDrawGizmos()
-    {
-        if (activeQuadrantPairs == null) return;
-
-        foreach (var pair in activeQuadrantPairs)
-        {
-            DrawGizmoThing(pair.Value.position, pair.Value.size);
-        }
-    }
-
-    private void DrawGizmoThing(Vector2Int position, Vector2Int size)
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(new Vector3(position.x + size.x / 2, 0f, position.y + size.y / 2), new Vector3(size.x, 0f, size.y));
+        root.GenerateTerrainTexture(GenerateMapData);
     }
 
     // Grab next size from QuadrantSize enum
@@ -143,6 +137,19 @@ public class TerrainQuadTree : MonoBehaviour
             return list[Array.IndexOf<QuadrantSize>(list, size) + 1];
         else
             return list[Array.IndexOf<QuadrantSize>(list, size) - 1];
+    }
+
+    void OnDrawGizmos()
+    {
+        if (visibleQuadrantPairs == null) return;
+
+        foreach (var pair in visibleQuadrantPairs)
+        {
+            Vector2Int position = pair.Key.position;
+            Vector2Int size = pair.Key.size;
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireCube(new Vector3(position.x + size.x / 2, 0f, position.y + size.y / 2), new Vector3(size.x, 0f, size.y));
+        }
     }
 }
 
