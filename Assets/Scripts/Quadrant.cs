@@ -186,13 +186,36 @@ public class Quadrant
 
     public void SaveTexture()
     {
+        Debug.Log("save file");
         byte[] bytes = texture.EncodeToPNG();
-        var dirPath = Application.dataPath + "/../SaveImages/";
+        var dirPath = Application.dataPath + "/../TERRAINDATA/";
 
         if (!Directory.Exists(dirPath))
             Directory.CreateDirectory(dirPath);
 
         File.WriteAllBytes(dirPath + "Image" + ".png", bytes);
+
+        /*if (topLeft != null)
+            topLeft.SaveTexture();
+        if (topRight != null)
+            topRight.SaveTexture();
+        if (bottomLeft != null)
+            bottomLeft.SaveTexture();
+        if (bottomRight != null)
+            bottomRight.SaveTexture();*/
+    }
+
+    public void LoadTerrain(string filePath)
+    {
+        Texture2D texture = null;
+        byte[] fileData;
+
+        if (File.Exists(filePath))
+        {
+            fileData = File.ReadAllBytes(filePath);
+            texture = new Texture2D(2, 2);
+            texture.LoadImage(fileData); //..this will auto-resize the texture dimensions.
+        }
     }
 
     public bool VisibleByMainCam()

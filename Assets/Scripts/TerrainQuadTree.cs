@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Linq;
+using System.IO;
 
 public class TerrainQuadTree : MonoBehaviour
 {
@@ -16,6 +17,13 @@ public class TerrainQuadTree : MonoBehaviour
     [SerializeField]
     private QuadrantSize maxSize;
 
+    [SerializeField]
+    private string saveFilePath;
+
+    [SerializeField]
+    private bool loadFromSave;
+
+    [SerializeField]
     public bool GenerateMapData;
 
     [Header("References")]
@@ -113,10 +121,20 @@ public class TerrainQuadTree : MonoBehaviour
 
     private void SaveTerrain()
     {
+        Debug.Log("start save");
         List<Quadrant> leaves = root.GetLeafQuadrants();
 
-        foreach (Quadrant quadrant in leaves)
-            quadrant.SaveTexture();
+        //foreach (Quadrant quadrant in leaves)
+        //    quadrant.SaveTexture();
+
+        root.SaveTexture();
+
+        Debug.Log("finish save");
+    }
+
+    private void LoadTerrain()
+    {
+        root.LoadTerrain(saveFilePath);
     }
 
     private void CreateTerrainData()
@@ -150,6 +168,7 @@ public class TerrainQuadTree : MonoBehaviour
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireCube(new Vector3(position.x + size.x / 2, 0f, position.y + size.y / 2), new Vector3(size.x, 0f, size.y));
         }
+        Gizmos.DrawWireCube(new Vector3(root.position.x + root.size.x / 2, 0f, root.position.y + root.size.y / 2), new Vector3(root.size.x, 0f, root.size.y));
     }
 }
 
