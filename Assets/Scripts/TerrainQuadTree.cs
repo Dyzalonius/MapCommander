@@ -18,13 +18,13 @@ public class TerrainQuadTree : MonoBehaviour
     private QuadrantSize maxSize;
 
     [SerializeField]
-    private string saveFilePath;
+    private TerrainLoadType loadType;
 
     [SerializeField]
-    private bool loadFromSave;
+    private string terrainDataFilePath;
 
     [SerializeField]
-    public bool GenerateMapData;
+    private string mapFolderName;
 
     [Header("References")]
     [SerializeField]
@@ -60,7 +60,17 @@ public class TerrainQuadTree : MonoBehaviour
     public void BuildTree()
     {
         root = new Quadrant(maxSize, minSize, position);
-        StartCoroutine(Threaded.RunOnThread(CreateTerrainData, DrawTerrain));
+        switch (loadType)
+        {
+            case TerrainLoadType.NONE:
+                break;
+            case TerrainLoadType.LOAD:
+                LoadTerrain();
+                break;
+            case TerrainLoadType.GENERATE:
+                StartCoroutine(Threaded.RunOnThread(CreateTerrainData, DrawTerrain));
+                break;
+        }
     }
 
     private void UpdateVisibleQuadrantScale()
@@ -114,37 +124,34 @@ public class TerrainQuadTree : MonoBehaviour
                 TerrainTexture terrainTexture = terrainTexturePool[0];
                 terrainTexturePool.Remove(terrainTexture);
                 terrainTexture.gameObject.SetActive(true);
-                terrainTexture.Setup(quadrant, GenerateMapData);
+                terrainTexture.Setup(quadrant, loadType != TerrainLoadType.NONE);
                 visibleQuadrantPairs.Add(quadrant, terrainTexture);
             }
     }
 
     private void SaveTerrain()
     {
-        Debug.Log("start save");
-        List<Quadrant> leaves = root.GetLeafQuadrants();
-
-        //foreach (Quadrant quadrant in leaves)
-        //    quadrant.SaveTexture();
-
-        root.SaveTexture();
-
-        Debug.Log("finish save");
+        Debug.Log("start saving");
+        string folderName = "map_" + System.DateTime.Now.ToString("yyyy-MM-dd_hhmmss");
+        root.SaveTerrainToPNG(folderName);
+        Debug.Log("finish saving");
     }
 
     private void LoadTerrain()
     {
-        root.LoadTerrain(saveFilePath);
+        Debug.Log("start loading");
+        root.LoadTerrainFromPNG(terrainDataFilePath + mapFolderName + "/");
+        Debug.Log("finish loading");
     }
 
     private void CreateTerrainData()
     {
-        root.GenerateTerrainData(GenerateMapData);
+        root.GenerateTerrainData();
     }
 
     private void DrawTerrain()
     {
-        root.GenerateTerrainTexture(GenerateMapData);
+        root.GenerateTerrainTexture();
     }
 
     // Grab next size from QuadrantSize enum
@@ -180,4 +187,11 @@ public enum QuadrantSize
     k32 = 32768,
     k64 = 65536,
     k128 = 131072
+}
+
+public enum TerrainLoadType
+{
+    NONE,
+    LOAD,
+    GENERATE
 }

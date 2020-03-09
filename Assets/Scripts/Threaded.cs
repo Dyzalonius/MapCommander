@@ -5,7 +5,7 @@ using UnityEngine;
 
 public static class Threaded
 {
-    public static IEnumerator RunOnThread(Action toRun, Action callback)
+    public static IEnumerator RunOnThread(Action toRun, Action callback = null)
     {
         bool done = false;
 
@@ -20,6 +20,7 @@ public static class Threaded
             yield return null;
 
         // Run callback
-        callback();
+        if (callback != null)
+            callback();
     }
 }

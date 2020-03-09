@@ -120,58 +120,49 @@ public class Quadrant
         return quadrantsOfSize;
     }
 
-    public void GenerateTerrainData(bool generate)
+    public void GenerateTerrainData()
     {
         // Create noise map
-        if (generate)
-        {
-            noiseMap = Noise.GenerateNoiseMap(new Vector2Int(textureSize, textureSize), 0, 300, 1, 0.5f, 1, Vector2.zero);
+        noiseMap = Noise.GenerateNoiseMap(new Vector2Int(textureSize, textureSize), 0, 300, 1, 0.5f, 1, Vector2.zero);
 
-            // Create color map
-            colorMap = new Color[noiseMap.Length];
-            for (int y = 0; y < textureSize; y++)
-                for (int x = 0; x < textureSize; x++)
-                {
-                    if (x * y > noiseMap.Length)
-                        Debug.Log(x + " * " + y + " = " + (x * y));
-                    colorMap[y * textureSize + x] = new Color(noiseMap[x, y], 0f, 0f);
-                }
-        }
+        // Create color map
+        colorMap = new Color[noiseMap.Length];
+        for (int y = 0; y < textureSize; y++)
+            for (int x = 0; x < textureSize; x++)
+            {
+                if (x * y > noiseMap.Length)
+                    Debug.Log(x + " * " + y + " = " + (x * y));
+                colorMap[y * textureSize + x] = new Color(noiseMap[x, y], 0f, 0f);
+            }
 
         if (topLeft != null)
-            topLeft.GenerateTerrainData(generate);
+            topLeft.GenerateTerrainData();
         if (topRight != null)
-            topRight.GenerateTerrainData(generate);
+            topRight.GenerateTerrainData();
         if (bottomLeft != null)
-            bottomLeft.GenerateTerrainData(generate);
+            bottomLeft.GenerateTerrainData();
         if (bottomRight != null)
-            bottomRight.GenerateTerrainData(generate);
-        Debug.Log("generated");
+            bottomRight.GenerateTerrainData();
     }
 
-    public void GenerateTerrainTexture(bool generate)
+    public void GenerateTerrainTexture()
     {
-        if (generate)
+        texture = new Texture2D(textureSize, textureSize)
         {
-            texture = new Texture2D(textureSize, textureSize)
-            {
-                filterMode = FilterMode.Point,
-                wrapMode = TextureWrapMode.Clamp
-            };
-            texture.SetPixels(colorMap);
-            texture.Apply();
-        }
+            filterMode = FilterMode.Point,
+            wrapMode = TextureWrapMode.Clamp
+        };
+        texture.SetPixels(colorMap);
+        texture.Apply();
 
         if (topLeft != null)
-            topLeft.GenerateTerrainTexture(generate);
+            topLeft.GenerateTerrainTexture();
         if (topRight != null)
-            topRight.GenerateTerrainTexture(generate);
+            topRight.GenerateTerrainTexture();
         if (bottomLeft != null)
-            bottomLeft.GenerateTerrainTexture(generate);
+            bottomLeft.GenerateTerrainTexture();
         if (bottomRight != null)
-            bottomRight.GenerateTerrainTexture(generate);
-
-        Debug.Log("applied");
+            bottomRight.GenerateTerrainTexture();
     }
 
     // Grab next size from QuadrantSize enum
@@ -184,38 +175,60 @@ public class Quadrant
             return list[Array.IndexOf<QuadrantSize>(list, size) - 1];
     }
 
-    public void SaveTexture()
+    public void SaveTerrainToPNG(string folderName, string suffix = "")
     {
         Debug.Log("save file");
         byte[] bytes = texture.EncodeToPNG();
-        var dirPath = Application.dataPath + "/../TERRAINDATA/";
+        var dirPath = Application.dataPath + "/../TERRAINDATA/" + folderName + "/";
 
         if (!Directory.Exists(dirPath))
             Directory.CreateDirectory(dirPath);
 
-        File.WriteAllBytes(dirPath + "Image" + ".png", bytes);
+        File.WriteAllBytes(dirPath + "Quadrant" + suffix + ".png", bytes);
 
-        /*if (topLeft != null)
-            topLeft.SaveTexture();
+        if (suffix == "")
+            suffix += "_";
+
+        if (topLeft != null)
+            topLeft.SaveTerrainToPNG(folderName, suffix + "0");
         if (topRight != null)
-            topRight.SaveTexture();
+            topRight.SaveTerrainToPNG(folderName, suffix + "1");
         if (bottomLeft != null)
-            bottomLeft.SaveTexture();
+            bottomLeft.SaveTerrainToPNG(folderName, suffix + "2");
         if (bottomRight != null)
-            bottomRight.SaveTexture();*/
+            bottomRight.SaveTerrainToPNG(folderName, suffix + "3");
     }
 
-    public void LoadTerrain(string filePath)
+    public void LoadTerrainFromPNG(string filePathBase, string suffix = "")
     {
         Texture2D texture = null;
         byte[] fileData;
+        string filePath = Application.dataPath + filePathBase + "Quadrant" + suffix + ".png";
 
-        if (File.Exists(filePath))
+        if (!File.Exists(filePath))
         {
-            fileData = File.ReadAllBytes(filePath);
-            texture = new Texture2D(2, 2);
-            texture.LoadImage(fileData); //..this will auto-resize the texture dimensions.
+            Debug.Log(filePath);
+            Debug.LogError("filePath does not exist");
+            return;
         }
+
+        fileData = File.ReadAllBytes(filePath);
+        texture = new Texture2D(2, 2); // Dimensions don't matter, LoadImage auto-resizes
+        texture.LoadImage(fileData);
+
+        this.texture = texture;
+
+        if (suffix == "")
+            suffix += "_";
+
+        if (topLeft != null)
+            topLeft.LoadTerrainFromPNG(filePathBase, suffix + "0");
+        if (topRight != null)
+            topRight.LoadTerrainFromPNG(filePathBase, suffix + "1");
+        if (bottomLeft != null)
+            bottomLeft.LoadTerrainFromPNG(filePathBase, suffix + "2");
+        if (bottomRight != null)
+            bottomRight.LoadTerrainFromPNG(filePathBase, suffix + "3");
     }
 
     public bool VisibleByMainCam()

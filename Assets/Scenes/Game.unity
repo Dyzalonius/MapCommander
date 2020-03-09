@@ -151,10 +151,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   position: {x: 0, y: 0}
   minSize: 4096
-  maxSize: 4096
-  saveFilePath: 
-  loadFromSave: 0
-  GenerateMapData: 0
+  maxSize: 16384
+  loadType: 1
+  terrainDataFilePath: /../TERRAINDATA/
+  mapFolderName: map_2020-03-09_114313
   terrainPlanePrefab: {fileID: -8926171133896632547, guid: 01de7d1a189eb7045b836feb837d3398,
     type: 3}
 --- !u!4 &214250946
