@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class Selection : MonoBehaviour
 {
+    [Header("References")]
+    [SerializeField]
+    private Camera cam;
+
+    [Header("Settings")]
     [SerializeField]
     private Color innerColor; // Selection box inner color
 
@@ -12,9 +17,6 @@ public class Selection : MonoBehaviour
 
     [SerializeField]
     private float borderThickness; // Selection box border color
-
-    [SerializeField]
-    private Camera cam;
 
     [HideInInspector]
     public List<Unit> Units = new List<Unit>();
@@ -35,10 +37,10 @@ public class Selection : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && Game.Instance.Player.TerrainBrush.Mode == TerrainBrushMode.NONE)
             StartSelection();
 
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0) && isSelecting)
             FinishSelection();
     }
 

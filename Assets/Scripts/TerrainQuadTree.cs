@@ -7,6 +7,10 @@ using System.IO;
 
 public class TerrainQuadTree : MonoBehaviour
 {
+    [Header("References")]
+    [SerializeField]
+    private TerrainTexture terrainPlanePrefab;
+
     [Header("Settings")]
     [SerializeField]
     private Vector2Int position;
@@ -18,17 +22,13 @@ public class TerrainQuadTree : MonoBehaviour
     private QuadrantSize maxSize;
 
     [SerializeField]
-    private TerrainLoadType loadType;
+    public TerrainLoadType loadType;
 
-    [SerializeField]
-    private string terrainDataFilePath;
+    [HideInInspector]
+    public string terrainDataFilepath;
 
-    [SerializeField]
-    private string mapFolderName;
-
-    [Header("References")]
-    [SerializeField]
-    private TerrainTexture terrainPlanePrefab;
+    [HideInInspector]
+    public string mapFolderName;
 
     [HideInInspector]
     public static TerrainQuadTree Instance { get; private set; } // static singleton
@@ -38,6 +38,14 @@ public class TerrainQuadTree : MonoBehaviour
     private List<TerrainTexture> terrainTexturePool;
     private Dictionary<Quadrant, TerrainTexture> visibleQuadrantPairs;
     private QuadrantSize visibleQuadrantScale;
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+    }
 
     private void Start()
     {
@@ -140,7 +148,7 @@ public class TerrainQuadTree : MonoBehaviour
     private void LoadTerrain()
     {
         Debug.Log("start loading");
-        root.LoadTerrainFromPNG(terrainDataFilePath + mapFolderName + "/");
+        root.LoadTerrainFromPNG(terrainDataFilepath + mapFolderName + "/");
         Debug.Log("finish loading");
     }
 
@@ -152,6 +160,28 @@ public class TerrainQuadTree : MonoBehaviour
     private void DrawTerrain()
     {
         root.GenerateTerrainTexture();
+    }
+
+    public void Paint(Vector2Int position, TerrainBrushMode mode)
+    {
+        Quadrant quadrantContainingPosition = null;
+        Vector2Int positionOnQuadrant = new Vector2Int(-1, -1);
+
+        foreach (Quadrant quadrant in root.GetLeafQuadrants()) //TODO: Optimize by only getting leafquadrants of visible quadrants
+        {
+            positionOnQuadrant = quadrant.PositionOnQuadrant(position);
+            
+            if (positionOnQuadrant != new Vector2Int(-1, -1))
+            {
+                quadrantContainingPosition = quadrant;
+                break;
+            }
+        }
+
+        if (quadrantContainingPosition != null && positionOnQuadrant != new Vector2Int(-1, -1))
+            quadrantContainingPosition.Paint(positionOnQuadrant, mode);
+        else
+            Debug.LogError("Couldn't find a quadrant or a local position to paint on - " + positionOnQuadrant);
     }
 
     // Grab next size from QuadrantSize enum
@@ -176,6 +206,12 @@ public class TerrainQuadTree : MonoBehaviour
             Gizmos.DrawWireCube(new Vector3(position.x + size.x / 2, 0f, position.y + size.y / 2), new Vector3(size.x, 0f, size.y));
         }
         Gizmos.DrawWireCube(new Vector3(root.position.x + root.size.x / 2, 0f, root.position.y + root.size.y / 2), new Vector3(root.size.x, 0f, root.size.y));
+    }
+
+    public void UpdateTerrainTexture(Quadrant quadrant)
+    {
+        if (visibleQuadrantPairs.ContainsKey(quadrant))
+            visibleQuadrantPairs[quadrant].UpdateTexture();
     }
 }
 

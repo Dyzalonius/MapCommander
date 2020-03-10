@@ -11,9 +11,6 @@ public class Game : MonoBehaviour
     [SerializeField]
     private GameObject unitPrefab;
 
-    [SerializeField]
-    private TerrainGrid terrain;
-
     [HideInInspector]
     public List<Unit> Units = new List<Unit>();
 

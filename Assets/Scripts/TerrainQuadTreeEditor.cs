@@ -10,14 +10,23 @@ public class TerrainQuadTreeEditor : Editor
     {
         TerrainQuadTree terrainQuadTree = (TerrainQuadTree)target;
 
-        if (DrawDefaultInspector())
+        DrawDefaultInspector();
+
+        switch (terrainQuadTree.loadType)
         {
-            //terrainQuadTree.BuildTree();
+            case TerrainLoadType.LOAD:
+                terrainQuadTree.terrainDataFilepath = EditorGUILayout.TextField("Terrain Data Filepath", terrainQuadTree.terrainDataFilepath);
+                terrainQuadTree.mapFolderName = EditorGUILayout.TextField("Map Folder Name", terrainQuadTree.mapFolderName);
+                break;
+
+            case TerrainLoadType.GENERATE:
+                if (GUILayout.Button("Generate"))
+                    terrainQuadTree.BuildTree();
+                break;
+
+            default:
+                break;
         }
 
-        if (GUILayout.Button("Generate"))
-        {
-            terrainQuadTree.BuildTree();
-        }
     }
 }

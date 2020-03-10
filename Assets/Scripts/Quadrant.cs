@@ -214,6 +214,8 @@ public class Quadrant
 
         fileData = File.ReadAllBytes(filePath);
         texture = new Texture2D(2, 2); // Dimensions don't matter, LoadImage auto-resizes
+        texture.filterMode = FilterMode.Point;
+        texture.wrapMode = TextureWrapMode.Clamp;
         texture.LoadImage(fileData);
 
         this.texture = texture;
@@ -237,5 +239,44 @@ public class Quadrant
         Vector3 topRightPos = Camera.main.WorldToViewportPoint(new Vector3(position.x + size.x, 0f, position.y + size.y));
 
         return !(bottomLeftPos.x > 1f || topRightPos.x < 0f || bottomLeftPos.y > 1f || topRightPos.y < 0f);
+    }
+
+    // return the Vector2Int position on this quadrant of a given world position. If position is off this quadrant, return (-1,-1)
+    public Vector2Int PositionOnQuadrant(Vector2Int pos)
+    {
+        Vector2Int posOnQuadrant = new Vector2Int(-1, -1);
+
+        if (pos.x >= position.x && pos.x < position.x + size.x && pos.y >= position.y && pos.y < position.y + size.y)
+            posOnQuadrant = new Vector2Int(pos.x - position.x, pos.y - position.y);
+
+        return posOnQuadrant;
+    }
+
+    public void Paint(Vector2Int position, TerrainBrushMode mode)
+    {
+        Color pixelColor = texture.GetPixel(size.x - position.x - 1, size.y - position.y - 1); //Dirty fix: For some reason the terrain is 180* rotated, so had to grab an odd pixel location
+        Color pixelColorNew = pixelColor;
+
+        switch (mode)
+        {
+            case TerrainBrushMode.ADDFOREST:
+                pixelColorNew.g = 1f;
+                break;
+
+            case TerrainBrushMode.REMOVEFOREST:
+                pixelColorNew.g = 0f;
+                break;
+
+            default:
+                break;
+        }
+
+        // Edit texture if new color is different
+        if (pixelColor != pixelColorNew)
+        {
+            texture.SetPixel(size.x - position.x - 1, size.y - position.y - 1, pixelColorNew); //Dirty fix: For some reason the terrain is 180* rotated, so had to grab an odd pixel location
+            texture.Apply();
+            TerrainQuadTree.Instance.UpdateTerrainTexture(this); //TODO: Make this also update textures of higher levels!
+        }
     }
 }

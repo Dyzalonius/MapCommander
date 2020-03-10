@@ -4,8 +4,12 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    [Header("References")]
     [SerializeField]
     public Camera Cam;
+
+    [SerializeField]
+    public TerrainBrush TerrainBrush;
 
     [HideInInspector]
     public Selection Selection;
@@ -16,7 +20,7 @@ public class Player : MonoBehaviour
     {
         mousePos = Cam.ScreenToWorldPoint(Input.mousePosition);
 
-        if (Input.GetMouseButtonUp(1))
+        if (Input.GetMouseButtonUp(1) && TerrainBrush.Mode == TerrainBrushMode.NONE)
             GiveUnitOrders(Input.GetKey(KeyCode.LeftShift));
     }
 

@@ -21,7 +21,7 @@ public class TerrainTexture : MonoBehaviour
         planePosition = new Vector3(quadrant.position.x + ((float) quadrant.size.x) / 2f, 0f, quadrant.position.y + ((float)quadrant.size.y) / 2f);
 
         if (generate)
-            textureRenderer.material.mainTexture = quadrant.texture;
+            UpdateTexture();
         textureRenderer.transform.localScale = planeScale;
         textureRenderer.transform.localPosition = planePosition;
     }
@@ -29,7 +29,12 @@ public class TerrainTexture : MonoBehaviour
     private void Update()
     {
         if (generate && quadrant.texture != textureRenderer.material.mainTexture)
-            textureRenderer.material.mainTexture = quadrant.texture;
+            UpdateTexture();
+    }
+
+    public void UpdateTexture()
+    {
+        textureRenderer.material.mainTexture = quadrant.texture;
     }
 
     public void Deactivate()
