@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+using UnityEngine;
 
 [CustomEditor(typeof(TerrainQuadTree))]
 public class TerrainQuadTreeEditor : Editor
@@ -30,3 +31,4 @@ public class TerrainQuadTreeEditor : Editor
 
     }
 }
+#endif
