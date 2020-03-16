@@ -7,27 +7,22 @@ using UnityEngine;
 public class PhotonManager : MonoBehaviour, IMatchmakingCallbacks, IInRoomCallbacks
 {
     [SerializeField]
-    private ClientList clientList;
+    private JoinRoomButton joinRoomButton;
+
+    public Client Client;
 
     [HideInInspector]
-    public static PhotonManager Instance { get; private set; } // static singleton
+    public static PhotonManager Instance { get; private set; } // Static singleton
 
     private void Awake()
     {
         if (Instance == null)
+        {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
         else
             Destroy(gameObject);
-    }
-
-    private void Start()
-    {
-
-    }
-
-    private void Update()
-    {
-
     }
 
     public virtual void OnEnable()
@@ -40,13 +35,7 @@ public class PhotonManager : MonoBehaviour, IMatchmakingCallbacks, IInRoomCallba
         PhotonNetwork.RemoveCallbackTarget(this);
     }
 
-    public void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
-    {
-        Debug.Log("OnPlayerEnteredRoom");
-
-        if (clientList != null)
-            clientList.AddClientItem();
-    }
+    public void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer) { }
 
     public void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer) { }
 
@@ -58,26 +47,13 @@ public class PhotonManager : MonoBehaviour, IMatchmakingCallbacks, IInRoomCallba
 
     public void OnFriendListUpdate(List<FriendInfo> friendList) { }
 
-    public void OnCreatedRoom()
-    {
-        Debug.Log("onCreatedRoom");
-    }
+    public void OnCreatedRoom() { }
 
-    public void OnCreateRoomFailed(short returnCode, string message)
-    {
-        Debug.Log("OnCreateRoomFailed");
-    }
+    public void OnCreateRoomFailed(short returnCode, string message) { }
 
-    public void OnJoinedRoom()
-    {
-        if (clientList != null)
-            clientList.AddClientItem();
-    }
+    public void OnJoinedRoom() { }
 
-    public void OnJoinRoomFailed(short returnCode, string message)
-    {
-        Debug.Log("OnJoinRoomFailed");
-    }
+    public void OnJoinRoomFailed(short returnCode, string message) { }
 
     public void OnJoinRandomFailed(short returnCode, string message) { }
 

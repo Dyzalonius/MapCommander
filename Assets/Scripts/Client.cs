@@ -4,14 +4,31 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Client : MonoBehaviourPunCallbacks
+public class Client : MonoBehaviour
 {
     [SerializeField]
-    private string clientName;
-
-    [SerializeField]
     private bool autoConnect = true;
-    
+
+    [HideInInspector]
+    public bool isReady = false;
+
+    [HideInInspector]
+    public string ClientName;
+
+    [HideInInspector]
+    public static Client Instance { get; private set; } // Static singleton
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+            Destroy(gameObject);
+    }
+
     private void Start()
     {
         if (autoConnect)
@@ -23,17 +40,14 @@ public class Client : MonoBehaviourPunCallbacks
         PhotonNetwork.ConnectUsingSettings();
     }
 
-    public override void OnConnectedToMaster()
+    public void JoinOrCreateRoom(string roomName, byte playerCount)
     {
-        Debug.Log("OnConnectedToMaster() was called by PUN. Now this client is connected and could join a room. Calling: PhotonNetwork.JoinOrCreateRoom();");
-        RoomOptions options = new RoomOptions() { MaxPlayers = 4 };
-        PhotonNetwork.JoinOrCreateRoom("mainroom", options, TypedLobby.Default);
+        RoomOptions options = new RoomOptions() { MaxPlayers = playerCount };
+        PhotonNetwork.JoinOrCreateRoom(roomName, options, TypedLobby.Default);
     }
 
-    public override void OnJoinedLobby()
+    public void ToggleReady()
     {
-        Debug.Log("OnJoinedLobby(). This client is connected. This script now calls: PhotonNetwork.JoinOrCreateRoom();");
-        RoomOptions options = new RoomOptions() { MaxPlayers = 4 };
-        PhotonNetwork.JoinOrCreateRoom("mainroom", options, TypedLobby.Default);
+        isReady = !isReady;
     }
 }

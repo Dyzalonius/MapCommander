@@ -326,6 +326,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 328c1ba336ab1be42b7604c4eac235af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  clientNameText: {fileID: 5034301187781587984}
+  readyText: {fileID: 758663542511798942}
+  readyButtonText: {fileID: 1781506355240536459}
+  readyButton: {fileID: 8214064165231427239}
 --- !u!1 &5981564553772804073
 GameObject:
   m_ObjectHideFlags: 0
@@ -493,7 +497,7 @@ GameObject:
   - component: {fileID: 2225656700595733571}
   - component: {fileID: 1781506355240536459}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: ClientReadyButtonText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
