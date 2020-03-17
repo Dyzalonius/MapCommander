@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -8,8 +7,8 @@ public class Quadrant
 {
     public Vector2Int position;
     public Vector2Int size; // Size of the quadrant, not size of the texture
+    public string id;
     private Quadrant parent;
-    private int depth;
 
     private Quadrant topLeft;
     private Quadrant topRight;
@@ -17,26 +16,28 @@ public class Quadrant
     private Quadrant bottomRight;
 
     public Texture2D texture; // Map data texture
-    public int textureSize = (int)QuadrantSize.k4;
+    public static int textureSize = (int)QuadrantSize.k4;
 
     private float[,] noiseMap;
-    private Color[] colorMap;
+    public Color[] colorMap;
 
     public Quadrant(QuadrantSize size, QuadrantSize minSize, Vector2Int position)
     {
         this.position = position;
         this.size = new Vector2Int((int)size, (int)size);
         Debug.Log("Size = " + this.size);
+        id = "";
 
         if ((int)size > (int)minSize)
             Split(NextSize(size, false), minSize);
     }
 
-    public Quadrant(QuadrantSize size, QuadrantSize minSize, Vector2Int offset, Quadrant parent)
+    public Quadrant(QuadrantSize size, QuadrantSize minSize, Vector2Int offset, Quadrant parent, string idSuffix)
     {
         this.parent = parent;
         position = new Vector2Int(this.parent.position.x + (int)size * offset.x, this.parent.position.y + (int)size * offset.y);
         this.size = new Vector2Int((int)size, (int)size);
+        id = parent.id + idSuffix;
 
         if ((int)size > (int)minSize)
             Split(NextSize(size, false), minSize);
@@ -45,10 +46,10 @@ public class Quadrant
     // Create four new Quadrants inside current Quadrant
     private void Split(QuadrantSize size, QuadrantSize minSize)
     {
-        topLeft = new Quadrant(size, minSize, Vector2Int.up, this);
-        topRight = new Quadrant(size, minSize, Vector2Int.one, this);
-        bottomLeft = new Quadrant(size, minSize, Vector2Int.zero, this);
-        bottomRight = new Quadrant(size, minSize, Vector2Int.right, this);
+        topLeft = new Quadrant(size, minSize, Vector2Int.up, this, "0");
+        topRight = new Quadrant(size, minSize, Vector2Int.one, this, "1");
+        bottomLeft = new Quadrant(size, minSize, Vector2Int.zero, this, "2");
+        bottomRight = new Quadrant(size, minSize, Vector2Int.right, this, "3");
     }
 
     public List<Quadrant> GetQuadrants(bool recursive)
@@ -175,39 +176,38 @@ public class Quadrant
             return list[Array.IndexOf<QuadrantSize>(list, size) - 1];
     }
 
-    public void SaveTerrainToPNG(string folderName, string suffix = "")
+    public void SaveTerrainToPNG(string filePathBase)
     {
         Debug.Log("save file");
         byte[] bytes = texture.EncodeToPNG();
-        var dirPath = Application.dataPath + "/../TERRAINDATA/" + folderName + "/";
+        var dirPath = Application.dataPath + filePathBase + "/";
+        string fileName = id == "" ? "Quadrant" : "Quadrant_" + id;
 
         if (!Directory.Exists(dirPath))
             Directory.CreateDirectory(dirPath);
 
-        File.WriteAllBytes(dirPath + "Quadrant" + suffix + ".png", bytes);
-
-        if (suffix == "")
-            suffix += "_";
+        File.WriteAllBytes(dirPath + fileName + ".png", bytes);
 
         if (topLeft != null)
-            topLeft.SaveTerrainToPNG(folderName, suffix + "0");
+            topLeft.SaveTerrainToPNG(filePathBase);
         if (topRight != null)
-            topRight.SaveTerrainToPNG(folderName, suffix + "1");
+            topRight.SaveTerrainToPNG(filePathBase);
         if (bottomLeft != null)
-            bottomLeft.SaveTerrainToPNG(folderName, suffix + "2");
+            bottomLeft.SaveTerrainToPNG(filePathBase);
         if (bottomRight != null)
-            bottomRight.SaveTerrainToPNG(folderName, suffix + "3");
+            bottomRight.SaveTerrainToPNG(filePathBase);
     }
 
-    public void LoadTerrainFromPNG(string filePathBase, string suffix = "")
+    public void LoadTerrainFromPNG(string filePathBase)
     {
         Texture2D texture = null;
         byte[] fileData;
-        string filePath = Application.dataPath + filePathBase + "Quadrant" + suffix + ".png";
+        string fileName = id == "" ? "Quadrant" : "Quadrant_" + id;
+        string filePath = Application.dataPath + filePathBase + fileName + ".png";
 
         if (!File.Exists(filePath))
         {
-            Debug.Log(filePath);
+            Debug.LogError(filePath);
             Debug.LogError("filePath does not exist");
             return;
         }
@@ -219,18 +219,16 @@ public class Quadrant
         texture.LoadImage(fileData);
 
         this.texture = texture;
-
-        if (suffix == "")
-            suffix += "_";
+        colorMap = texture.GetPixels();
 
         if (topLeft != null)
-            topLeft.LoadTerrainFromPNG(filePathBase, suffix + "0");
+            topLeft.LoadTerrainFromPNG(filePathBase);
         if (topRight != null)
-            topRight.LoadTerrainFromPNG(filePathBase, suffix + "1");
+            topRight.LoadTerrainFromPNG(filePathBase);
         if (bottomLeft != null)
-            bottomLeft.LoadTerrainFromPNG(filePathBase, suffix + "2");
+            bottomLeft.LoadTerrainFromPNG(filePathBase);
         if (bottomRight != null)
-            bottomRight.LoadTerrainFromPNG(filePathBase, suffix + "3");
+            bottomRight.LoadTerrainFromPNG(filePathBase);
     }
 
     public bool VisibleByMainCam()

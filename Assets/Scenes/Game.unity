@@ -155,7 +155,8 @@ MonoBehaviour:
   minSize: 4096
   maxSize: 8192
   loadType: 1
-  terrainDataFilepath: /../TERRAINDATA/
+  filepathPrefixInEditor: /..
+  filepathTerrainData: /TERRAINDATA/
   mapFolderName: newmaptex
 --- !u!4 &214250946
 Transform:

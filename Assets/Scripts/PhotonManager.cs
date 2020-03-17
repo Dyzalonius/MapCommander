@@ -1,7 +1,9 @@
-﻿using Photon.Pun;
+﻿using ExitGames.Client.Photon;
+using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class PhotonManager : MonoBehaviour, IMatchmakingCallbacks, IInRoomCallbacks

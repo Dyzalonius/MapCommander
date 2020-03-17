@@ -78,7 +78,7 @@ public class LobbyManager : MonoBehaviour, IMatchmakingCallbacks, IInRoomCallbac
 
             foreach (var pair in PhotonNetwork.CurrentRoom.Players)
             {
-                if (!(bool)pair.Value.CustomProperties["isReady"])
+                if (!(bool)pair.Value.CustomProperties["isReady"]) //TODO: when master client readys up with another client, this gives nullrefexception
                 {
                     allReady = false;
                     break;

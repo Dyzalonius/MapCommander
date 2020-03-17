@@ -16,11 +16,14 @@ public class TerrainQuadTreeEditor : Editor
         switch (terrainQuadTree.loadType)
         {
             case TerrainLoadType.LOAD:
-                terrainQuadTree.terrainDataFilepath = EditorGUILayout.TextField("Terrain Data Filepath", terrainQuadTree.terrainDataFilepath);
+                terrainQuadTree.filepathPrefixInEditor = EditorGUILayout.TextField("Filepath Prefix In Editor", terrainQuadTree.filepathPrefixInEditor);
+                terrainQuadTree.filepathTerrainData = EditorGUILayout.TextField("Filepath Terrain Data", terrainQuadTree.filepathTerrainData);
                 terrainQuadTree.mapFolderName = EditorGUILayout.TextField("Map Folder Name", terrainQuadTree.mapFolderName);
                 break;
 
             case TerrainLoadType.GENERATE:
+                terrainQuadTree.filepathPrefixInEditor = EditorGUILayout.TextField("Filepath Prefix In Editor", terrainQuadTree.filepathPrefixInEditor);
+                terrainQuadTree.filepathTerrainData = EditorGUILayout.TextField("Filepath Terrain Data", terrainQuadTree.filepathTerrainData);
                 if (GUILayout.Button("Generate"))
                     terrainQuadTree.BuildTree();
                 break;

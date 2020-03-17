@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using System.Linq;
 using System.IO;
+using Photon.Pun;
 
 public class TerrainQuadTree : MonoBehaviour
 {
@@ -25,7 +26,10 @@ public class TerrainQuadTree : MonoBehaviour
     public TerrainLoadType loadType;
 
     [HideInInspector]
-    public string terrainDataFilepath;
+    public string filepathPrefixInEditor = "/..";
+
+    [HideInInspector]
+    public string filepathTerrainData;
 
     [HideInInspector]
     public string mapFolderName;
@@ -63,6 +67,9 @@ public class TerrainQuadTree : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.S))
             SaveTerrain();
+
+        if (Input.GetKeyDown(KeyCode.H))
+            ShareTerrain();
     }
 
     public void BuildTree()
@@ -141,15 +148,22 @@ public class TerrainQuadTree : MonoBehaviour
     {
         Debug.Log("start saving");
         string folderName = "map_" + System.DateTime.Now.ToString("yyyy-MM-dd_hhmmss");
-        root.SaveTerrainToPNG(folderName);
+        root.SaveTerrainToPNG((Application.isEditor ? filepathPrefixInEditor : "") + filepathTerrainData + folderName);
         Debug.Log("finish saving");
     }
 
     private void LoadTerrain()
     {
         Debug.Log("start loading");
-        root.LoadTerrainFromPNG(terrainDataFilepath + mapFolderName + "/");
+        root.LoadTerrainFromPNG((Application.isEditor ? filepathPrefixInEditor : "") + filepathTerrainData + mapFolderName + "/");
         Debug.Log("finish loading");
+    }
+
+    private void ShareTerrain()
+    {
+        Debug.LogError("start sharing");
+        SendTerrainData(root.colorMap, root.id);
+        Debug.LogError("finish sharing");
     }
 
     private void CreateTerrainData()
@@ -212,6 +226,63 @@ public class TerrainQuadTree : MonoBehaviour
     {
         if (visibleQuadrantPairs.ContainsKey(quadrant))
             visibleQuadrantPairs[quadrant].UpdateTexture();
+    }
+
+    public void SendTerrainData(Color[] colorMap, string id)
+    {
+        byte[] terrainData = new byte[Quadrant.textureSize * Quadrant.textureSize * 2];
+        string fileName = id == "" ? "Quadrant" : "Quadrant_" + id + ".png";
+
+        for (int i = 0; i < Quadrant.textureSize * Quadrant.textureSize; i++)
+        {
+            terrainData[2 * i] = (byte)(colorMap[i].r * 255);
+            terrainData[(2 * i) + 1] = (byte)(colorMap[i].g * 255);
+        }
+
+        PhotonView photonView = PhotonView.Get(this);
+        Debug.LogError(photonView != null);
+        photonView.RPC("ReceiveTerrainDataRPC", RpcTarget.Others, terrainData, fileName);
+    }
+
+    [PunRPC]
+    public void ReceiveTerrainDataRPC(byte[] terrainData, string fileName, PhotonMessageInfo info)
+    {
+        // Create color map using terrainData
+        Color[] colorMap = new Color[Quadrant.textureSize * Quadrant.textureSize];
+        for (int i = 0; i < Quadrant.textureSize * Quadrant.textureSize; i++)
+        {
+            Color color = new Color
+            {
+                r = terrainData[2 * i],
+                g = terrainData[(2 * i) + 1],
+                b = 0
+            };
+            colorMap[i] = color;
+        }
+
+        // Create texture using color map
+        Texture2D texture = new Texture2D(Quadrant.textureSize, Quadrant.textureSize)
+        {
+            filterMode = FilterMode.Point,
+            wrapMode = TextureWrapMode.Clamp
+        };
+        texture.SetPixels(colorMap);
+        texture.Apply();
+
+        // Create png using texture
+        byte[] bytes = texture.EncodeToPNG();
+        var dirPath = Application.dataPath + (Application.isEditor ? filepathPrefixInEditor : "") + filepathTerrainData;
+
+        if (!Directory.Exists(dirPath))
+            Directory.CreateDirectory(dirPath);
+
+        File.WriteAllBytes(dirPath + fileName, bytes);
+
+        //Debug.LogFormat("Info: {0} {1} {2}", info.Sender, info.photonView, info.SentServerTime);
+        Debug.LogFormat("Difference = ", PhotonNetwork.Time - info.SentServerTimestamp);
+
+        //Temp
+        LoadTerrain();
     }
 }
 
