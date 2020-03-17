@@ -59,5 +59,5 @@ public class PhotonManager : MonoBehaviour, IMatchmakingCallbacks, IInRoomCallba
 
     public void OnJoinRandomFailed(short returnCode, string message) { }
 
-    public void OnLeftRoom() { }
+    public void OnLeftRoom() { Debug.LogError("OnLeftRoom"); }
 }

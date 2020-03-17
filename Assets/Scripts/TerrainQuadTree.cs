@@ -6,7 +6,7 @@ using System.Linq;
 using System.IO;
 using Photon.Pun;
 
-public class TerrainQuadTree : MonoBehaviour
+public class TerrainQuadTree : MonoBehaviour//, IPunObservable
 {
     [Header("References")]
     [SerializeField]
@@ -230,26 +230,30 @@ public class TerrainQuadTree : MonoBehaviour
 
     public void SendTerrainData(Color[] colorMap, string id)
     {
-        byte[] terrainData = new byte[Quadrant.textureSize * Quadrant.textureSize * 2];
-        string fileName = id == "" ? "Quadrant" : "Quadrant_" + id + ".png";
 
-        for (int i = 0; i < Quadrant.textureSize * Quadrant.textureSize; i++)
+        for (int i = 0; i < 128; i++)
         {
-            terrainData[2 * i] = (byte)(colorMap[i].r * 255);
-            terrainData[(2 * i) + 1] = (byte)(colorMap[i].g * 255);
-        }
+            string fileName = (id == "" ? "Quadrant" : "Quadrant_") + id + ".png" + " (" + i + ")";
+            byte[] terrainData = new byte[Quadrant.textureSize * 32 * 2];
 
-        PhotonView photonView = PhotonView.Get(this);
-        Debug.LogError(photonView != null);
-        photonView.RPC("ReceiveTerrainDataRPC", RpcTarget.Others, terrainData, fileName);
+            for (int j = 0; j < Quadrant.textureSize * 32; j++)
+            {
+                terrainData[2 * j] = (byte)(colorMap[(128 * i) + j].r * 255);
+                terrainData[(2 * j) + 1] = (byte)(colorMap[(128 * i) + j].g * 255);
+            }
+
+            PhotonView photonView = PhotonView.Get(this);
+            photonView.RPC("ReceiveTerrainDataRPC", RpcTarget.Others, terrainData, fileName);
+        }
     }
 
     [PunRPC]
     public void ReceiveTerrainDataRPC(byte[] terrainData, string fileName, PhotonMessageInfo info)
     {
+        //Debug.LogError("start receiving");
         // Create color map using terrainData
-        Color[] colorMap = new Color[Quadrant.textureSize * Quadrant.textureSize];
-        for (int i = 0; i < Quadrant.textureSize * Quadrant.textureSize; i++)
+        Color[] colorMap = new Color[Quadrant.textureSize * 32];
+        for (int i = 0; i < Quadrant.textureSize * 32; i++)
         {
             Color color = new Color
             {
@@ -259,15 +263,17 @@ public class TerrainQuadTree : MonoBehaviour
             };
             colorMap[i] = color;
         }
+        //Debug.LogError("> colormap done");
 
         // Create texture using color map
-        Texture2D texture = new Texture2D(Quadrant.textureSize, Quadrant.textureSize)
+        /*Texture2D texture = new Texture2D(Quadrant.textureSize, Quadrant.textureSize)
         {
             filterMode = FilterMode.Point,
             wrapMode = TextureWrapMode.Clamp
         };
         texture.SetPixels(colorMap);
         texture.Apply();
+        Debug.LogError("> texture done");
 
         // Create png using texture
         byte[] bytes = texture.EncodeToPNG();
@@ -277,13 +283,28 @@ public class TerrainQuadTree : MonoBehaviour
             Directory.CreateDirectory(dirPath);
 
         File.WriteAllBytes(dirPath + fileName, bytes);
+        Debug.LogError("> texture done");*/
 
         //Debug.LogFormat("Info: {0} {1} {2}", info.Sender, info.photonView, info.SentServerTime);
-        Debug.LogFormat("Difference = ", PhotonNetwork.Time - info.SentServerTimestamp);
+        //Debug.LogFormat("Difference = ", PhotonNetwork.Time - info.SentServerTimestamp);
+        Debug.LogError("finish receiving " + fileName);
 
         //Temp
-        LoadTerrain();
+        //LoadTerrain();
     }
+
+    /*public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            //stream.SendNext(new object());
+        }
+
+        if (stream.IsReading)
+        {
+            //object thing = stream.ReceiveNext();
+        }
+    }*/
 }
 
 public enum QuadrantSize
