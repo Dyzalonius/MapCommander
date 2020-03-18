@@ -35,7 +35,7 @@ public class Player : MonoBehaviour
             if (!modifier)
                 x.Waypoints.Clear();
 
-            x.Waypoints.Enqueue(mousePos);
+            x.Waypoints.Enqueue(new UnitWaypoint(mousePos));
         });
     }
 }

@@ -15,12 +15,12 @@ public class Unit : MonoBehaviour
     public bool IsHovered;
 
     [HideInInspector]
-    public Queue<Vector3> Waypoints = new Queue<Vector3>();
+    public Queue<UnitWaypoint> Waypoints = new Queue<UnitWaypoint>();
 
     private void FixedUpdate()
     {
         if (Waypoints.Count > 0)
-            Move(Waypoints.Peek());
+            Move(Waypoints.Peek().Position);
     }
 
     private void Move(Vector3 moveTarget)
@@ -32,7 +32,7 @@ public class Unit : MonoBehaviour
         if (moveVector.magnitude == 0)
         {
             // Dequeue if moveTarget was a waypoint
-            if (moveTarget == Waypoints.Peek())
+            if (moveTarget == Waypoints.Peek().Position)
                 Waypoints.Dequeue();
             return;
         }

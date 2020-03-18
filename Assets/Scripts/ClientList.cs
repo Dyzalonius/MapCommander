@@ -9,7 +9,6 @@ public class ClientList : MonoBehaviour
     private ClientItem clientItemPrefab;
 
     private List<Photon.Realtime.Player> players = new List<Photon.Realtime.Player>();
-
     private Dictionary<Photon.Realtime.Player, ClientItem> clientItems = new Dictionary<Photon.Realtime.Player, ClientItem>();
 
     public void UpdateList()

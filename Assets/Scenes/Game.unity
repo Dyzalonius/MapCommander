@@ -305,6 +305,7 @@ GameObject:
   - component: {fileID: 519420030}
   - component: {fileID: 519420034}
   - component: {fileID: 519420033}
+  - component: {fileID: 519420035}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -497,6 +498,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: 7c9af09fcbaeeba4081e5a5daf9c9f2a, type: 2}
   mapGrid: {fileID: 519420033}
+  unitWaypointLines: {fileID: 519420035}
+--- !u!114 &519420035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52e87dfa53d00a646be45aa5ff533a3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cam: {fileID: 519420031}
+  lineMaterial: {fileID: 2100000, guid: 91ee7fc8dcebd41429eaba935cf0b6c2, type: 2}
 --- !u!1 &1578062413
 GameObject:
   m_ObjectHideFlags: 0
@@ -587,8 +603,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
-  - {fileID: 1763688407}
   - {fileID: 1966466798}
+  - {fileID: 1763688407}
   - {fileID: 2113013001}
   - {fileID: 2035509004}
   m_Father: {fileID: 0}
@@ -628,7 +644,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1578062417}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -678,7 +694,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1578062417}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -697,6 +713,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec6c2e67426521942a0291c8e3e8b51d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  unitWaypointMarkerPrefab: {fileID: 579377219499205211, guid: 4aa874d60d0a22e41adaf7ebf7006cd6,
+    type: 3}
 --- !u!1 &2035509001
 GameObject:
   m_ObjectHideFlags: 0

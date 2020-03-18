@@ -13,10 +13,14 @@ public class PostProcessingTerrain : MonoBehaviour
 	[SerializeField]
 	private MapGrid mapGrid;
 
+	[SerializeField]
+	private UnitWaypointLines unitWaypointLines;
+
 	private void OnRenderImage(RenderTexture source, RenderTexture destination)
 	{
 		Graphics.Blit(source, destination, material);
 
 		mapGrid.DrawGrid();
+		unitWaypointLines.DrawLines();
 	}
 }
