@@ -306,6 +306,7 @@ GameObject:
   - component: {fileID: 519420034}
   - component: {fileID: 519420033}
   - component: {fileID: 519420035}
+  - component: {fileID: 519420036}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -499,6 +500,7 @@ MonoBehaviour:
   material: {fileID: 2100000, guid: 7c9af09fcbaeeba4081e5a5daf9c9f2a, type: 2}
   mapGrid: {fileID: 519420033}
   unitWaypointLines: {fileID: 519420035}
+  unitRangeCircles: {fileID: 519420036}
 --- !u!114 &519420035
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -513,6 +515,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cam: {fileID: 519420031}
   lineMaterial: {fileID: 2100000, guid: 91ee7fc8dcebd41429eaba935cf0b6c2, type: 2}
+--- !u!114 &519420036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80257e86fb70cbe448cf0f89bd6b5b6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cam: {fileID: 519420031}
+  lineMaterial: {fileID: 2100000, guid: 4cdf2ff3620f3c24c93a0eedda99fb39, type: 2}
+  vertexCount: 48
 --- !u!1 &1578062413
 GameObject:
   m_ObjectHideFlags: 0

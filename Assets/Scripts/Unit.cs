@@ -8,6 +8,9 @@ public class Unit : MonoBehaviour
     [SerializeField]
     private float movementSpeed; // in km/h
 
+    [SerializeField]
+    public float range; // in meters
+
     [HideInInspector]
     public bool IsSelected;
 

@@ -16,11 +16,15 @@ public class PostProcessingTerrain : MonoBehaviour
 	[SerializeField]
 	private UnitWaypointLines unitWaypointLines;
 
+	[SerializeField]
+	private UnitRangeCircles unitRangeCircles;
+
 	private void OnRenderImage(RenderTexture source, RenderTexture destination)
 	{
 		Graphics.Blit(source, destination, material);
 
 		mapGrid.DrawGrid();
 		unitWaypointLines.DrawLines();
+		unitRangeCircles.DrawCircles();
 	}
 }
