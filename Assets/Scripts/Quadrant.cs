@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Pun;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -250,7 +251,7 @@ public class Quadrant
         return posOnQuadrant;
     }
 
-    public void Paint(Vector2Int position, TerrainBrushMode mode)
+    public void TryPaint(Vector2Int position, TerrainBrushMode mode)
     {
         Color pixelColor = texture.GetPixel(size.x - position.x - 1, size.y - position.y - 1); //Dirty fix: For some reason the terrain is 180* rotated, so had to grab an odd pixel location
         Color pixelColorNew = pixelColor;
@@ -272,9 +273,14 @@ public class Quadrant
         // Edit texture if new color is different
         if (pixelColor != pixelColorNew)
         {
-            texture.SetPixel(size.x - position.x - 1, size.y - position.y - 1, pixelColorNew); //Dirty fix: For some reason the terrain is 180* rotated, so had to grab an odd pixel location
-            texture.Apply();
-            TerrainQuadTree.Instance.UpdateTerrainTexture(this); //TODO: Make this also update textures of higher levels!
+            TerrainQuadTree.Instance.PaintSend(position, pixelColorNew, id);
         }
+    }
+
+    public void Paint(Vector2Int position, Color newPixelColor)
+    {
+        texture.SetPixel(size.x - position.x - 1, size.y - position.y - 1, newPixelColor); //Dirty fix: For some reason the terrain is 180* rotated, so had to grab an odd pixel location
+        texture.Apply();
+        TerrainQuadTree.Instance.UpdateTerrainTexture(this); //TODO: Make this also update textures of higher levels!
     }
 }

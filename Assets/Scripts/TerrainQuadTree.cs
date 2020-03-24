@@ -176,28 +176,6 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
         root.GenerateTerrainTexture();
     }
 
-    public void Paint(Vector2Int position, TerrainBrushMode mode)
-    {
-        Quadrant quadrantContainingPosition = null;
-        Vector2Int positionOnQuadrant = new Vector2Int(-1, -1);
-
-        foreach (Quadrant quadrant in root.GetLeafQuadrants()) //TODO: Optimize by only getting leafquadrants of visible quadrants
-        {
-            positionOnQuadrant = quadrant.PositionOnQuadrant(position);
-            
-            if (positionOnQuadrant != new Vector2Int(-1, -1))
-            {
-                quadrantContainingPosition = quadrant;
-                break;
-            }
-        }
-
-        if (quadrantContainingPosition != null && positionOnQuadrant != new Vector2Int(-1, -1))
-            quadrantContainingPosition.Paint(positionOnQuadrant, mode);
-        else
-            Debug.LogError("Couldn't find a quadrant or a local position to paint on - " + positionOnQuadrant);
-    }
-
     // Grab next size from QuadrantSize enum
     private QuadrantSize NextSize(QuadrantSize size, bool nextRatherThanPrevious = true)
     {
@@ -291,6 +269,45 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
 
         //Temp
         //LoadTerrain();
+    }
+
+    public void TryPaint(Vector2Int position, TerrainBrushMode mode)
+    {
+        Quadrant quadrantContainingPosition = null;
+        Vector2Int positionOnQuadrant = new Vector2Int(-1, -1);
+
+        foreach (Quadrant quadrant in root.GetLeafQuadrants()) //TODO: Optimize by only getting leafquadrants of visible quadrants
+        {
+            positionOnQuadrant = quadrant.PositionOnQuadrant(position);
+
+            if (positionOnQuadrant != new Vector2Int(-1, -1))
+            {
+                quadrantContainingPosition = quadrant;
+                break;
+            }
+        }
+
+        if (quadrantContainingPosition != null && positionOnQuadrant != new Vector2Int(-1, -1))
+            quadrantContainingPosition.TryPaint(positionOnQuadrant, mode);
+        else
+            Debug.LogError("Couldn't find a quadrant or a local position to paint on - " + positionOnQuadrant);
+    }
+
+    public void PaintSend(Vector2Int position, Color color, string quadrantID)
+    {
+        PhotonView photonView = PhotonView.Get(this);
+        byte[] colorArray = new byte[] { (byte)(color.r * 255), (byte)(color.g * 255), (byte)(color.b * 255), (byte)(color.a * 255) };
+        photonView.RPC("PaintReceiveRPC", RpcTarget.All, position.x, position.y, colorArray, quadrantID);
+    }
+
+    [PunRPC]
+    public void PaintReceiveRPC(int posX, int posY, byte[] colorArray, string quadrantID, PhotonMessageInfo info)
+    {
+        List<Quadrant> allQuadrants = root.GetLeafQuadrants();
+        Quadrant quadrant = allQuadrants.Find(x => x.id == quadrantID);
+        Color color = new Color((float)colorArray[0] / 255, (float)colorArray[1] / 255, (float)colorArray[2] / 255, (float)colorArray[3] / 255);
+
+        quadrant.Paint(new Vector2Int(posX, posY), color);
     }
 
     /*public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

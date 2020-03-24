@@ -37,5 +37,6 @@ MonoBehaviour:
   - ClickReadyButtonRemote
   - SendTerrainDataRPC
   - ReceiveTerrainDataRPC
+  - PaintReceiveRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1

@@ -30,7 +30,7 @@ public class TerrainBrush : MonoBehaviour
     private void Paint()
     {
         foreach (Vector2Int position in FindPositions())
-            TerrainQuadTree.Instance.Paint(position, Mode);
+            TerrainQuadTree.Instance.TryPaint(position, Mode);
     }
 
     private List<Vector2Int> FindPositions()
