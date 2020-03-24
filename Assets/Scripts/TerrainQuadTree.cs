@@ -70,6 +70,12 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
 
         if (Input.GetKeyDown(KeyCode.H))
             ShareTerrain();
+
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            List<Quadrant> quadrants = root.GetLeafQuadrants();
+            quadrants.ForEach(x => x.ApplyAllTerrainChanges());
+        }
     }
 
     public void BuildTree()
@@ -307,7 +313,7 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
         Quadrant quadrant = allQuadrants.Find(x => x.id == quadrantID);
         Color color = new Color((float)colorArray[0] / 255, (float)colorArray[1] / 255, (float)colorArray[2] / 255, (float)colorArray[3] / 255);
 
-        quadrant.Paint(new Vector2Int(posX, posY), color);
+        quadrant.EditTerrain(new Vector2Int(posX, posY), color);
     }
 
     /*public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

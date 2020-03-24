@@ -10,17 +10,16 @@ public class Quadrant
     public Vector2Int size; // Size of the quadrant, not size of the texture
     public string id;
     private Quadrant parent;
-
     private Quadrant topLeft;
     private Quadrant topRight;
     private Quadrant bottomLeft;
     private Quadrant bottomRight;
-
     public Texture2D texture; // Map data texture
     public static int textureSize = (int)QuadrantSize.k4;
 
     private float[,] noiseMap;
     public Color[] colorMap;
+    private Dictionary<Vector2Int, Color> terrainChanges = new Dictionary<Vector2Int, Color>();
 
     public Quadrant(QuadrantSize size, QuadrantSize minSize, Vector2Int position)
     {
@@ -275,6 +274,40 @@ public class Quadrant
         {
             TerrainQuadTree.Instance.PaintSend(position, pixelColorNew, id);
         }
+    }
+
+    public void EditTerrain(Vector2Int position, Color color)
+    {
+        if (terrainChanges.ContainsKey(position))
+            terrainChanges[position] = color;
+        else
+            terrainChanges.Add(position, color);
+    }
+
+    public void ApplyAllTerrainChanges()
+    {
+        Vector2Int[] positions = new Vector2Int[terrainChanges.Count];
+        Color[] colors = new Color[terrainChanges.Count];
+
+        int i = 0;
+        foreach (var pair in terrainChanges)
+        {
+            positions[i] = pair.Key;
+            colors[i] = pair.Value;
+            i++;
+        }
+
+        ApplyTerrainChange(positions, colors);
+    }
+
+    public void ApplyTerrainChange(Vector2Int[] positions, Color[] colors)
+    {
+        for (int i = 0; i < positions.Length; i++)
+        {
+            texture.SetPixel(size.x - positions[i].x - 1, size.y - positions[i].y - 1, colors[i]); //Dirty fix: For some reason the terrain is 180* rotated, so had to grab an odd pixel location
+        }
+        texture.Apply();
+        TerrainQuadTree.Instance.UpdateTerrainTexture(this); //TODO: Make this also update textures of higher levels!
     }
 
     public void Paint(Vector2Int position, Color newPixelColor)
