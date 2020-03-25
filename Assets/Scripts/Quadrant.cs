@@ -284,6 +284,24 @@ public class Quadrant
             terrainChanges.Add(position, color);
     }
 
+    public void UpdateTerrainChanges()
+    {
+        List<Vector2Int> positions = new List<Vector2Int>();
+        List<Color> colors = new List<Color>();
+
+        // Check for every terrain change, for every unit, if the unit is in range to see the change
+        foreach (var pair in terrainChanges)
+            foreach (Unit unit in Game.Instance.Units) //TODO: change it so that if a unit has been found that sees one change, put him at the front of the list, because changes are often close to eachother
+                if (Vector2.Distance(new Vector2(unit.transform.position.x, unit.transform.position.z), new Vector2(pair.Key.x, pair.Key.y)) < unit.range)
+                {
+                    positions.Add(pair.Key);
+                    colors.Add(pair.Value);
+                }
+
+        if (positions.Count > 0)
+            ApplyTerrainChange(positions.ToArray(), colors.ToArray());
+    }
+
     public void ApplyAllTerrainChanges()
     {
         Vector2Int[] positions = new Vector2Int[terrainChanges.Count];
@@ -305,6 +323,7 @@ public class Quadrant
         for (int i = 0; i < positions.Length; i++)
         {
             texture.SetPixel(size.x - positions[i].x - 1, size.y - positions[i].y - 1, colors[i]); //Dirty fix: For some reason the terrain is 180* rotated, so had to grab an odd pixel location
+            terrainChanges.Remove(positions[i]);
         }
         texture.Apply();
         TerrainQuadTree.Instance.UpdateTerrainTexture(this); //TODO: Make this also update textures of higher levels!

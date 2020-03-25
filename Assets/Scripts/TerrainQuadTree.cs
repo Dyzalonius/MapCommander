@@ -64,6 +64,7 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
     {
         UpdateVisibleQuadrantScale();
         UpdateVisibleQuadrants();
+        UpdateQuadrantChanges();
 
         if (Input.GetKeyDown(KeyCode.S))
             SaveTerrain();
@@ -148,6 +149,12 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
                 terrainTexture.Setup(quadrant, loadType != TerrainLoadType.NONE);
                 visibleQuadrantPairs.Add(quadrant, terrainTexture);
             }
+    }
+
+    private void UpdateQuadrantChanges()
+    {
+        List<Quadrant> leafQuadrants = root.GetLeafQuadrants();
+        leafQuadrants.ForEach(x => x.UpdateTerrainChanges());
     }
 
     private void SaveTerrain()
