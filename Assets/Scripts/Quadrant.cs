@@ -10,12 +10,12 @@ public class Quadrant
     public Vector2Int size; // Size of the quadrant, not size of the texture
     public string id;
     private Quadrant parent;
-    private Quadrant topLeft;
-    private Quadrant topRight;
     private Quadrant bottomLeft;
     private Quadrant bottomRight;
+    private Quadrant topLeft;
+    private Quadrant topRight;
     public Texture2D texture; // Map data texture
-    public static int textureSize = (int)QuadrantSize.k4;
+    public int textureSize;
 
     private float[,] noiseMap;
     public Color[] colorMap;
@@ -25,6 +25,7 @@ public class Quadrant
     {
         this.position = position;
         this.size = new Vector2Int((int)size, (int)size);
+        textureSize = (int)minSize;
         Debug.Log("Size = " + this.size);
         id = "";
 
@@ -37,6 +38,7 @@ public class Quadrant
         this.parent = parent;
         position = new Vector2Int(this.parent.position.x + (int)size * offset.x, this.parent.position.y + (int)size * offset.y);
         this.size = new Vector2Int((int)size, (int)size);
+        textureSize = (int)minSize;
         id = parent.id + idSuffix;
 
         if ((int)size > (int)minSize)
@@ -46,10 +48,10 @@ public class Quadrant
     // Create four new Quadrants inside current Quadrant
     private void Split(QuadrantSize size, QuadrantSize minSize)
     {
-        topLeft = new Quadrant(size, minSize, Vector2Int.up, this, "0");
-        topRight = new Quadrant(size, minSize, Vector2Int.one, this, "1");
-        bottomLeft = new Quadrant(size, minSize, Vector2Int.zero, this, "2");
-        bottomRight = new Quadrant(size, minSize, Vector2Int.right, this, "3");
+        bottomLeft = new Quadrant(size, minSize, Vector2Int.zero, this, "0");
+        bottomRight = new Quadrant(size, minSize, Vector2Int.right, this, "1");
+        topLeft = new Quadrant(size, minSize, Vector2Int.up, this, "2");
+        topRight = new Quadrant(size, minSize, Vector2Int.one, this, "3");
     }
 
     public List<Quadrant> GetQuadrants(bool recursive)
@@ -59,14 +61,14 @@ public class Quadrant
         if (recursive)
         {
             quadrants.Add(this);
-            if (topLeft != null)
-                quadrants.AddRange(topLeft.GetQuadrants(recursive));
-            if (topRight != null)
-                quadrants.AddRange(topRight.GetQuadrants(recursive));
             if (bottomLeft != null)
                 quadrants.AddRange(bottomLeft.GetQuadrants(recursive));
             if (bottomRight != null)
                 quadrants.AddRange(bottomRight.GetQuadrants(recursive));
+            if (topLeft != null)
+                quadrants.AddRange(topLeft.GetQuadrants(recursive));
+            if (topRight != null)
+                quadrants.AddRange(topRight.GetQuadrants(recursive));
         }
         else
         {
@@ -84,14 +86,14 @@ public class Quadrant
         List<Quadrant> leaves = new List<Quadrant>();
 
         // If quadrant has children, add leafquadrants of children
-        if (topLeft != null)
-            leaves.AddRange(topLeft.GetLeafQuadrants());
-        if (topRight != null)
-            leaves.AddRange(topRight.GetLeafQuadrants());
         if (bottomLeft != null)
             leaves.AddRange(bottomLeft.GetLeafQuadrants());
         if (bottomRight != null)
             leaves.AddRange(bottomRight.GetLeafQuadrants());
+        if (topLeft != null)
+            leaves.AddRange(topLeft.GetLeafQuadrants());
+        if (topRight != null)
+            leaves.AddRange(topRight.GetLeafQuadrants());
 
         // If quadrant has no children, this quadrant is a leaf
         if (leaves.Count == 0)
@@ -108,14 +110,14 @@ public class Quadrant
             quadrantsOfSize.Add(this);
         else
         {
-            if (topLeft != null)
-                quadrantsOfSize.AddRange(topLeft.FindQuadrantsOfSize(size));
-            if (topRight != null)
-                quadrantsOfSize.AddRange(topRight.FindQuadrantsOfSize(size));
             if (bottomLeft != null)
                 quadrantsOfSize.AddRange(bottomLeft.FindQuadrantsOfSize(size));
             if (bottomRight != null)
                 quadrantsOfSize.AddRange(bottomRight.FindQuadrantsOfSize(size));
+            if (topLeft != null)
+                quadrantsOfSize.AddRange(topLeft.FindQuadrantsOfSize(size));
+            if (topRight != null)
+                quadrantsOfSize.AddRange(topRight.FindQuadrantsOfSize(size));
         }
 
         return quadrantsOfSize;
@@ -136,34 +138,37 @@ public class Quadrant
                 colorMap[y * textureSize + x] = new Color(noiseMap[x, y], 0f, 0f);
             }
 
-        if (topLeft != null)
-            topLeft.GenerateTerrainData();
-        if (topRight != null)
-            topRight.GenerateTerrainData();
         if (bottomLeft != null)
             bottomLeft.GenerateTerrainData();
         if (bottomRight != null)
             bottomRight.GenerateTerrainData();
+        if (topLeft != null)
+            topLeft.GenerateTerrainData();
+        if (topRight != null)
+            topRight.GenerateTerrainData();
     }
 
     public void GenerateTerrainTexture()
     {
-        texture = new Texture2D(textureSize, textureSize)
+        if (colorMap != null && colorMap.Length > 0)
         {
-            filterMode = FilterMode.Point,
-            wrapMode = TextureWrapMode.Clamp
-        };
-        texture.SetPixels(colorMap);
-        texture.Apply();
+            texture = new Texture2D(textureSize, textureSize)
+            {
+                filterMode = FilterMode.Point,
+                wrapMode = TextureWrapMode.Clamp
+            };
+            texture.SetPixels(colorMap);
+            texture.Apply();
+        }
 
-        if (topLeft != null)
-            topLeft.GenerateTerrainTexture();
-        if (topRight != null)
-            topRight.GenerateTerrainTexture();
         if (bottomLeft != null)
             bottomLeft.GenerateTerrainTexture();
         if (bottomRight != null)
             bottomRight.GenerateTerrainTexture();
+        if (topLeft != null)
+            topLeft.GenerateTerrainTexture();
+        if (topRight != null)
+            topRight.GenerateTerrainTexture();
     }
 
     // Grab next size from QuadrantSize enum
@@ -174,6 +179,41 @@ public class Quadrant
             return list[Array.IndexOf<QuadrantSize>(list, size) + 1];
         else
             return list[Array.IndexOf<QuadrantSize>(list, size) - 1];
+    }
+
+    public void BuildColorMaps()
+    {
+        if (bottomLeft.colorMap == null)
+            bottomLeft.BuildColorMaps();
+        if (bottomRight.colorMap == null)
+            bottomRight.BuildColorMaps();
+        if (topLeft.colorMap == null)
+            topLeft.BuildColorMaps();
+        if (topRight.colorMap == null)
+            topRight.BuildColorMaps();
+
+        // Create colorMap of all children
+        Color[] combinedColorMap = new Color[textureSize * textureSize * 4];
+        for (int i = 0; i < bottomLeft.colorMap.Length; i++)
+            combinedColorMap[((Mathf.FloorToInt(i / textureSize)) * textureSize * 2) + (i % textureSize)] = bottomLeft.colorMap[i];
+        for (int i = 0; i < bottomRight.colorMap.Length; i++)
+            combinedColorMap[((Mathf.FloorToInt(i / textureSize)) * textureSize * 2) + textureSize + (i % textureSize)] = bottomRight.colorMap[i];
+        for (int i = 0; i < topLeft.colorMap.Length; i++)
+            combinedColorMap[((textureSize + Mathf.FloorToInt(i / textureSize)) * textureSize * 2) + (i % textureSize)] = topLeft.colorMap[i];
+        for (int i = 0; i < topRight.colorMap.Length; i++)
+            combinedColorMap[((textureSize + Mathf.FloorToInt(i / textureSize)) * textureSize * 2) + textureSize + (i % textureSize)] = topRight.colorMap[i];
+
+        // Shrink colorMap by combining pixels
+        colorMap = new Color[textureSize * textureSize];
+        for (int i = 0; i < colorMap.Length; i++)
+        {
+            int rowIncrement = (Mathf.FloorToInt(i / textureSize)) * textureSize * 4;
+            int columnIncrement = (i % textureSize) * 2;
+            float red = (combinedColorMap[columnIncrement + rowIncrement].r + combinedColorMap[columnIncrement + 1 + rowIncrement].r + combinedColorMap[columnIncrement + (textureSize * 2) + rowIncrement].r + combinedColorMap[columnIncrement + 1 + (textureSize * 2) + rowIncrement].r) / 4;
+            float green = (combinedColorMap[columnIncrement + rowIncrement].g + combinedColorMap[columnIncrement + 1 + rowIncrement].g + combinedColorMap[columnIncrement + (textureSize * 2) + rowIncrement].g + combinedColorMap[columnIncrement + 1 + (textureSize * 2) + rowIncrement].g) / 4;
+            Color color = new Color(red, green, 0f);
+            colorMap[i] = color;
+        }
     }
 
     public void SaveTerrainToPNG(string filePathBase)
@@ -188,14 +228,14 @@ public class Quadrant
 
         File.WriteAllBytes(dirPath + fileName + ".png", bytes);
 
-        if (topLeft != null)
-            topLeft.SaveTerrainToPNG(filePathBase);
-        if (topRight != null)
-            topRight.SaveTerrainToPNG(filePathBase);
         if (bottomLeft != null)
             bottomLeft.SaveTerrainToPNG(filePathBase);
         if (bottomRight != null)
             bottomRight.SaveTerrainToPNG(filePathBase);
+        if (topLeft != null)
+            topLeft.SaveTerrainToPNG(filePathBase);
+        if (topRight != null)
+            topRight.SaveTerrainToPNG(filePathBase);
     }
 
     public void LoadTerrainFromPNG(string filePathBase)
@@ -221,14 +261,14 @@ public class Quadrant
         this.texture = texture;
         colorMap = texture.GetPixels();
 
-        if (topLeft != null)
-            topLeft.LoadTerrainFromPNG(filePathBase);
-        if (topRight != null)
-            topRight.LoadTerrainFromPNG(filePathBase);
         if (bottomLeft != null)
             bottomLeft.LoadTerrainFromPNG(filePathBase);
         if (bottomRight != null)
             bottomRight.LoadTerrainFromPNG(filePathBase);
+        if (topLeft != null)
+            topLeft.LoadTerrainFromPNG(filePathBase);
+        if (topRight != null)
+            topRight.LoadTerrainFromPNG(filePathBase);
     }
 
     public bool VisibleByMainCam()
@@ -252,7 +292,7 @@ public class Quadrant
 
     public void TryPaint(Vector2Int position, TerrainBrushMode mode)
     {
-        Color pixelColor = texture.GetPixel(size.x - position.x - 1, size.y - position.y - 1); //Dirty fix: For some reason the terrain is 180* rotated, so had to grab an odd pixel location
+        Color pixelColor = texture.GetPixel(position.x, position.y);
         Color pixelColorNew = pixelColor;
 
         switch (mode)
@@ -322,17 +362,85 @@ public class Quadrant
     {
         for (int i = 0; i < positions.Length; i++)
         {
-            texture.SetPixel(size.x - positions[i].x - 1, size.y - positions[i].y - 1, colors[i]); //Dirty fix: For some reason the terrain is 180* rotated, so had to grab an odd pixel location
+            texture.SetPixel(positions[i].x, positions[i].y, colors[i]);
             terrainChanges.Remove(positions[i]);
         }
+        Debug.Log("applying " + positions.Length + " changes to " + id);
         texture.Apply();
-        TerrainQuadTree.Instance.UpdateTerrainTexture(this); //TODO: Make this also update textures of higher levels!
+        TerrainQuadTree.Instance.UpdateTerrainTexture(this);
+
+        // Find neighbors of positions and combine the colors
+        List<Vector2Int> parentPositions = new List<Vector2Int>();
+        List<Color> combinedColors = new List<Color>();
+        for (int i = 0; i < positions.Length; i++)
+        {
+            string lastChar = id.Substring(id.Length - 1);
+            Vector2Int basePos = new Vector2Int(Mathf.FloorToInt(positions[i].x / 2) * 2, Mathf.FloorToInt(positions[i].y / 2) * 2);
+            Color combinedColor = (texture.GetPixel(basePos.x, basePos.y) + texture.GetPixel(basePos.x + 1, basePos.y) + texture.GetPixel(basePos.x, basePos.y + 1) + texture.GetPixel(basePos.x + 1, basePos.y + 1)) / 4;
+            Vector2Int basePosOffset = new Vector2Int(lastChar == "1" || lastChar == "3" ? size.x : 0, lastChar == "2" || lastChar == "3" ? size.y : 0);
+            basePos.x += basePosOffset.x;
+            basePos.y += basePosOffset.y;
+            Vector2Int parentPosition = new Vector2Int(basePos.x / 2, basePos.y / 2);
+            if (!parentPositions.Contains(parentPosition))
+            {
+                parentPositions.Add(parentPosition);
+                combinedColors.Add(combinedColor);
+            }
+        }
+        parent.ApplyTerrainChangeRecursive(parentPositions, combinedColors);
     }
 
-    public void Paint(Vector2Int position, Color newPixelColor)
+    private void ApplyTerrainChangeRecursive(List<Vector2Int> positions, List<Color> colors)
     {
-        texture.SetPixel(size.x - position.x - 1, size.y - position.y - 1, newPixelColor); //Dirty fix: For some reason the terrain is 180* rotated, so had to grab an odd pixel location
-        texture.Apply();
-        TerrainQuadTree.Instance.UpdateTerrainTexture(this); //TODO: Make this also update textures of higher levels!
+        List<Vector2Int> remainingPositions = new List<Vector2Int>();
+
+        for (int i = 0; i < positions.Count; i++)
+        {
+            bool edited = false;
+            if (texture.GetPixel(positions[i].x, positions[i].y) != colors[i]) //TODO: Make sure similar colors actually return false here (rounding issues)
+            {
+                texture.SetPixel(positions[i].x, positions[i].y, colors[i]);
+                edited = true;
+            }
+
+            if (edited)
+                remainingPositions.Add(positions[i]);
+        }
+
+        // Apply changes and call recursively if any edits were made
+        if (remainingPositions.Count > 0 && parent != null)
+        {
+            Debug.Log("applying " + remainingPositions.Count + " changes to " + id);
+            texture.Apply();
+            TerrainQuadTree.Instance.UpdateTerrainTexture(this);
+
+            List<Vector2Int> parentPositions = new List<Vector2Int>();
+            List<Color> combinedColors = new List<Color>();
+            for (int i = 0; i < remainingPositions.Count; i++)
+            {
+                string lastChar = id.Substring(id.Length - 1);
+                Vector2Int basePos = new Vector2Int(Mathf.FloorToInt(remainingPositions[i].x / 2) * 2, Mathf.FloorToInt(remainingPositions[i].y / 2) * 2);
+                Color combinedColor = (texture.GetPixel(basePos.x, basePos.y) + texture.GetPixel(basePos.x + 1, basePos.y) + texture.GetPixel(basePos.x, basePos.y + 1) + texture.GetPixel(basePos.x + 1, basePos.y + 1)) / 4;
+                Vector2Int basePosOffset = new Vector2Int(lastChar == "1" || lastChar == "3" ? bottomLeft.size.x : 0, lastChar == "2" || lastChar == "3" ? bottomLeft.size.y : 0);
+                basePos.x += basePosOffset.x;
+                basePos.y += basePosOffset.y;
+                Vector2Int parentPosition = new Vector2Int(basePos.x / 2, basePos.y / 2);
+                if (!parentPositions.Contains(parentPosition))
+                {
+                    parentPositions.Add(parentPosition);
+                    combinedColors.Add(combinedColor);
+                }
+            }
+            parent.ApplyTerrainChangeRecursive(parentPositions, combinedColors); //TODO: this call doesn't work. The 2nd time it goes through this recursive call, it breaks and doesn't display the changes.
+        }
+    }
+
+    private Vector2Int[] GetGlobalPositions(Vector2Int[] positions)
+    {
+        Vector2Int[] globalPositions = new Vector2Int[positions.Length];
+        for (int i = 0; i < globalPositions.Length; i++)
+            globalPositions[i] = new Vector2Int(position.x + this.position.x, position.y + this.position.y);
+        return globalPositions;
     }
 }
+ 

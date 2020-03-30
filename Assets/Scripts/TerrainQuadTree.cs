@@ -77,6 +77,9 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
             List<Quadrant> quadrants = root.GetLeafQuadrants();
             quadrants.ForEach(x => x.ApplyAllTerrainChanges());
         }
+
+        if (Input.GetKeyDown(KeyCode.C))
+            ConvertTerrainTo512();
     }
 
     public void BuildTree()
@@ -100,7 +103,7 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
         float pos1 = Camera.main.ScreenToWorldPoint(Vector3.zero).x;
         float pos2 = Camera.main.ScreenToWorldPoint(new Vector3(Camera.main.scaledPixelWidth, 0f, 0f)).x;
         float metersPerPixel = (pos2 - pos1) / Camera.main.scaledPixelWidth;
-        float texelsPerMeter = (int)QuadrantSize.k4 / ((float)visibleQuadrantScale);
+        float texelsPerMeter = (int)minSize / ((float)visibleQuadrantScale);
         float texelsPerPixel = metersPerPixel * texelsPerMeter;
         //Debug.Log("tpp = " + texelsPerPixel);
 
@@ -172,6 +175,44 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
         Debug.Log("finish loading");
     }
 
+    // This was a one use method for converting to 512x512
+    private void ConvertTerrainTo512()
+    {
+        Debug.Log("convert start");
+
+        // add every color to the color map
+        Color[] colorMap = new Color[(int)maxSize * (int)maxSize];
+        foreach (Quadrant quadrant in root.GetLeafQuadrants())
+            for (int i = 0; i < quadrant.colorMap.Length; i++)
+                colorMap[((quadrant.position.y + Mathf.FloorToInt(i / (int)minSize)) * (int)maxSize) + quadrant.position.x + (i % (int)minSize)] = quadrant.colorMap[i];
+
+        Debug.Log("colormap done");
+
+        // create new quadrants with new scale
+        minSize = QuadrantSize.p512;
+        root = new Quadrant(maxSize, minSize, position);
+
+        Debug.Log("quadrant creation done");
+
+        // give quadrants appropriate colormaps
+        foreach (Quadrant quadrant in root.GetLeafQuadrants())
+        {
+            quadrant.colorMap = new Color[(int)minSize * (int)minSize];
+            for (int i = 0; i < quadrant.colorMap.Length; i++)
+                quadrant.colorMap[i] = colorMap[((quadrant.position.y + Mathf.FloorToInt(i / (int)minSize)) * (int)maxSize) + quadrant.position.x + (i % (int)minSize)];
+        }
+
+        // give parent quadrants appropriate colormaps
+        root.BuildColorMaps();
+
+        Debug.Log("colormap assignment done");
+
+        // generate textures for all quadrants
+        DrawTerrain();
+
+        // save all textures
+    }
+
     private void ShareTerrain()
     {
         Debug.LogError("start sharing");
@@ -225,9 +266,9 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
         for (int i = 0; i < 128; i++)
         {
             string fileName = (id == "" ? "Quadrant" : "Quadrant_") + id + ".png" + " (" + i + ")";
-            byte[] terrainData = new byte[Quadrant.textureSize * 32 * 2];
+            byte[] terrainData = new byte[(int)minSize * 32 * 2];
 
-            for (int j = 0; j < Quadrant.textureSize * 32; j++)
+            for (int j = 0; j < (int)minSize * 32; j++)
             {
                 terrainData[2 * j] = (byte)(colorMap[(128 * i) + j].r * 255);
                 terrainData[(2 * j) + 1] = (byte)(colorMap[(128 * i) + j].g * 255);
@@ -243,8 +284,8 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
     {
         //Debug.LogError("start receiving");
         // Create color map using terrainData
-        Color[] colorMap = new Color[Quadrant.textureSize * 32];
-        for (int i = 0; i < Quadrant.textureSize * 32; i++)
+        Color[] colorMap = new Color[(int)minSize * 32];
+        for (int i = 0; i < (int)minSize * 32; i++)
         {
             Color color = new Color
             {
@@ -339,6 +380,9 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
 
 public enum QuadrantSize
 {
+    p512 = 512,
+    k1 = 1024,
+    k2 = 2048,
     k4 = 4096,
     k8 = 8192,
     k16 = 16384,

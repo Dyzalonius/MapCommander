@@ -13,6 +13,9 @@ public class UnitWaypointLines : MonoBehaviour
 
     public void DrawLines()
     {
+        if (Game.Instance == null)
+            return;
+
         foreach (Unit unit in Game.Instance.Units)
         {
             Vector3 startPos = unit.transform.position;

@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class TerrainBrush : MonoBehaviour
 {
+    [SerializeField]
+    private int brushSize;
+
     [HideInInspector]
     public TerrainBrushMode Mode = TerrainBrushMode.NONE;
 
@@ -38,9 +41,21 @@ public class TerrainBrush : MonoBehaviour
         List<Vector2Int> positions = new List<Vector2Int>();
 
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        positions.Add(new Vector2Int(Mathf.FloorToInt(mousePos.x), Mathf.FloorToInt(mousePos.z)));
+        Vector2Int centerPos = new Vector2Int(Mathf.FloorToInt(mousePos.x), Mathf.FloorToInt(mousePos.z));
+        for (int i = -brushSize + 1; i < brushSize; i++)
+            for (int j = -brushSize + 1; j < brushSize; j++)
+                positions.Add(new Vector2Int(centerPos.x + i, centerPos.y + j));
 
         return positions;
+    }
+
+    private void OnValidate()
+    {
+        if (brushSize < 1)
+            brushSize = 1;
+
+        if (brushSize > 10)
+            brushSize = 10;
     }
 }
 
