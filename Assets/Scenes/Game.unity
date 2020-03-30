@@ -498,10 +498,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c85de6fd833d324fadf12c721734b01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cam: {fileID: 519420031}
   material: {fileID: 2100000, guid: 7c9af09fcbaeeba4081e5a5daf9c9f2a, type: 2}
   mapGrid: {fileID: 519420033}
   unitWaypointLines: {fileID: 519420035}
   unitRangeCircles: {fileID: 519420036}
+  terrainIncrementFactor: 0.00001
+  camScaleStep: 100
+  terrainIncrementMinimum: 0.005
 --- !u!114 &519420035
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -7,6 +7,10 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class PostProcessingTerrain : MonoBehaviour
 {
+	[Header("References")]
+	[SerializeField]
+	private Camera cam;
+
 	[SerializeField]
 	private Material material;
 
@@ -19,8 +23,19 @@ public class PostProcessingTerrain : MonoBehaviour
 	[SerializeField]
 	private UnitRangeCircles unitRangeCircles;
 
+	[Header("Settings")]
+	[SerializeField]
+	private float terrainIncrementFactor;
+
+	[SerializeField]
+	private float camScaleStep;
+
+	[SerializeField]
+	private float terrainIncrementMinimum = 0.005f;
+
 	private void OnRenderImage(RenderTexture source, RenderTexture destination)
 	{
+		material.SetFloat("_Increment", Mathf.Max(Mathf.Floor(cam.orthographicSize / camScaleStep) * camScaleStep * terrainIncrementFactor, terrainIncrementMinimum));
 		Graphics.Blit(source, destination, material);
 
 		mapGrid.DrawGrid();
