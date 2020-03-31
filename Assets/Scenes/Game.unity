@@ -413,7 +413,7 @@ MonoBehaviour:
   cam: {fileID: 519420031}
   gridSize: 100000
   gridCellSize: 100
-  gridPadding: {x: 15, y: 30}
+  gridPadding: {x: 12, y: 20}
   gridLevelColors:
   - {r: 0, g: 0, b: 0, a: 0.2}
   - {r: 0, g: 0, b: 0, a: 1}

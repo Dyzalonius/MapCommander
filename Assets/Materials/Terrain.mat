@@ -79,7 +79,14 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _ForestColor: {r: 0.7960785, g: 0.8705883, b: 0.67058, a: 1}
+    - _GroundColor: {r: 0.96862745, g: 0.95686275, b: 0.9490196, a: 1}
     - _MajorLineColor: {r: 0.7686275, g: 0.654902, b: 0.56862, a: 1}
+    - _MajorLineForestColor: {r: 0.69803923, g: 0.7176471, b: 0.47843137, a: 1}
+    - _MajorLineGroundColor: {r: 0.76862746, g: 0.654902, b: 0.5686275, a: 1}
+    - _MajorLineWaterColor: {r: 0.5686275, g: 0.64705884, b: 0.7607843, a: 1}
     - _MinorLineColor: {r: 0.86666673, g: 0.8117648, b: 0.76862, a: 1}
+    - _MinorLineForestColor: {r: 0.7490196, g: 0.79607844, b: 0.5764706, a: 1}
+    - _MinorLineGroundColor: {r: 0.87058824, g: 0.80784315, b: 0.75686276, a: 1}
+    - _MinorLineWaterColor: {r: 0.64705884, g: 0.7294118, b: 0.8392157, a: 1}
     - _NonLineColor: {r: 0.96862745, g: 0.95686275, b: 0.9490196, a: 1}
     - _WaterColor: {r: 0.7176471, g: 0.7960785, b: 0.90196, a: 1}
