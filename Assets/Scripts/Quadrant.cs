@@ -365,7 +365,6 @@ public class Quadrant
             texture.SetPixel(positions[i].x, positions[i].y, colors[i]);
             terrainChanges.Remove(positions[i]);
         }
-        Debug.Log("applying " + positions.Length + " changes to " + id);
         texture.Apply();
         TerrainQuadTree.Instance.UpdateTerrainTexture(this);
 
@@ -377,7 +376,7 @@ public class Quadrant
             string lastChar = id.Substring(id.Length - 1);
             Vector2Int basePos = new Vector2Int(Mathf.FloorToInt(positions[i].x / 2) * 2, Mathf.FloorToInt(positions[i].y / 2) * 2);
             Color combinedColor = (texture.GetPixel(basePos.x, basePos.y) + texture.GetPixel(basePos.x + 1, basePos.y) + texture.GetPixel(basePos.x, basePos.y + 1) + texture.GetPixel(basePos.x + 1, basePos.y + 1)) / 4;
-            Vector2Int basePosOffset = new Vector2Int(lastChar == "1" || lastChar == "3" ? size.x : 0, lastChar == "2" || lastChar == "3" ? size.y : 0);
+            Vector2Int basePosOffset = new Vector2Int(lastChar == "1" || lastChar == "3" ? textureSize : 0, lastChar == "2" || lastChar == "3" ? textureSize : 0);
             basePos.x += basePosOffset.x;
             basePos.y += basePosOffset.y;
             Vector2Int parentPosition = new Vector2Int(basePos.x / 2, basePos.y / 2);
@@ -408,30 +407,33 @@ public class Quadrant
         }
 
         // Apply changes and call recursively if any edits were made
-        if (remainingPositions.Count > 0 && parent != null)
+        if (remainingPositions.Count > 0)
         {
-            Debug.Log("applying " + remainingPositions.Count + " changes to " + id);
             texture.Apply();
-            TerrainQuadTree.Instance.UpdateTerrainTexture(this);
 
-            List<Vector2Int> parentPositions = new List<Vector2Int>();
-            List<Color> combinedColors = new List<Color>();
-            for (int i = 0; i < remainingPositions.Count; i++)
+            if (parent != null)
             {
-                string lastChar = id.Substring(id.Length - 1);
-                Vector2Int basePos = new Vector2Int(Mathf.FloorToInt(remainingPositions[i].x / 2) * 2, Mathf.FloorToInt(remainingPositions[i].y / 2) * 2);
-                Color combinedColor = (texture.GetPixel(basePos.x, basePos.y) + texture.GetPixel(basePos.x + 1, basePos.y) + texture.GetPixel(basePos.x, basePos.y + 1) + texture.GetPixel(basePos.x + 1, basePos.y + 1)) / 4;
-                Vector2Int basePosOffset = new Vector2Int(lastChar == "1" || lastChar == "3" ? bottomLeft.size.x : 0, lastChar == "2" || lastChar == "3" ? bottomLeft.size.y : 0);
-                basePos.x += basePosOffset.x;
-                basePos.y += basePosOffset.y;
-                Vector2Int parentPosition = new Vector2Int(basePos.x / 2, basePos.y / 2);
-                if (!parentPositions.Contains(parentPosition))
+                TerrainQuadTree.Instance.UpdateTerrainTexture(this);
+
+                List<Vector2Int> parentPositions = new List<Vector2Int>();
+                List<Color> combinedColors = new List<Color>();
+                for (int i = 0; i < remainingPositions.Count; i++)
                 {
-                    parentPositions.Add(parentPosition);
-                    combinedColors.Add(combinedColor);
+                    string lastChar = id.Substring(id.Length - 1);
+                    Vector2Int basePos = new Vector2Int(Mathf.FloorToInt(remainingPositions[i].x / 2) * 2, Mathf.FloorToInt(remainingPositions[i].y / 2) * 2);
+                    Color combinedColor = (texture.GetPixel(basePos.x, basePos.y) + texture.GetPixel(basePos.x + 1, basePos.y) + texture.GetPixel(basePos.x, basePos.y + 1) + texture.GetPixel(basePos.x + 1, basePos.y + 1)) / 4;
+                    Vector2Int basePosOffset = new Vector2Int(lastChar == "1" || lastChar == "3" ? textureSize : 0, lastChar == "2" || lastChar == "3" ? textureSize : 0);
+                    basePos.x += basePosOffset.x;
+                    basePos.y += basePosOffset.y;
+                    Vector2Int parentPosition = new Vector2Int(basePos.x / 2, basePos.y / 2);
+                    if (!parentPositions.Contains(parentPosition))
+                    {
+                        parentPositions.Add(parentPosition);
+                        combinedColors.Add(combinedColor);
+                    }
                 }
+                parent.ApplyTerrainChangeRecursive(parentPositions, combinedColors); //TODO: this call doesn't work. The 2nd time it goes through this recursive call, it breaks and doesn't display the changes.
             }
-            parent.ApplyTerrainChangeRecursive(parentPositions, combinedColors); //TODO: this call doesn't work. The 2nd time it goes through this recursive call, it breaks and doesn't display the changes.
         }
     }
 
