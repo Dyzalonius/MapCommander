@@ -158,7 +158,7 @@ MonoBehaviour:
   loadType: 1
   filepathPrefixInEditor: /..
   filepathTerrainData: /TERRAINDATA/
-  mapFolderName: map2
+  mapFolderName: map1
 --- !u!4 &214250946
 Transform:
   m_ObjectHideFlags: 0

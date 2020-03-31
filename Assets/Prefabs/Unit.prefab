@@ -44,6 +44,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movementSpeed: 8
-  range: 10000
+  range: 1000
   IsSelected: 0
   IsHovered: 0
