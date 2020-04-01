@@ -17,6 +17,9 @@ public class UnitRangeCircles : MonoBehaviour
 
     public void DrawCircles()
     {
+        if (Game.Instance == null)
+            return;
+
         foreach (Unit unit in Game.Instance.Player.Selection.Units)
             DrawCircle(unit.transform.position, unit.range);
     }
