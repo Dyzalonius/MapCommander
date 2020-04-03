@@ -332,7 +332,7 @@ public class Quadrant
         // Check for every terrain change, for every unit, if the unit is in range to see the change
         foreach (var pair in terrainChanges)
             foreach (Unit unit in Game.Instance.Units) //TODO: change it so that if a unit has been found that sees one change, put him at the front of the list, because changes are often close to eachother
-                if (Vector2.Distance(new Vector2(unit.transform.position.x, unit.transform.position.z), new Vector2(pair.Key.x, pair.Key.y)) < unit.range)
+                if (Vector2.Distance(new Vector2(unit.transform.position.x, unit.transform.position.z), new Vector2(position.x + pair.Key.x, position.y + pair.Key.y)) < unit.range)
                 {
                     positions.Add(pair.Key);
                     colors.Add(pair.Value);
@@ -360,6 +360,7 @@ public class Quadrant
 
     public void ApplyTerrainChange(Vector2Int[] positions, Color[] colors)
     {
+        Debug.Log("apply");
         for (int i = 0; i < positions.Length; i++)
         {
             texture.SetPixel(positions[i].x, positions[i].y, colors[i]);
