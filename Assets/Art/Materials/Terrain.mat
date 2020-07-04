@@ -1,0 +1,92 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Terrain
+  m_Shader: {fileID: 4800000, guid: f045c541b5085fc44b9cb49578e26410, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _BumpScale: 1
+    - _Cutoff: 0.5
+    - _DetailNormalMapScale: 1
+    - _DstBlend: 0
+    - _GlossMapScale: 1
+    - _Glossiness: 0.5
+    - _GlossyReflections: 1
+    - _Increment: 0.081999995
+    - _MajorLineModulo: 5
+    - _Metallic: 0
+    - _Mode: 0
+    - _OcclusionStrength: 1
+    - _Parallax: 0.02
+    - _SmoothnessTextureChannel: 0
+    - _SpecularHighlights: 1
+    - _SrcBlend: 1
+    - _UVSec: 0
+    - _WaterLevel: 0.21
+    - _ZWrite: 1
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _ForestColor: {r: 0.7960785, g: 0.8705883, b: 0.67058, a: 1}
+    - _GroundColor: {r: 0.96862745, g: 0.95686275, b: 0.9490196, a: 1}
+    - _MajorLineColor: {r: 0.7686275, g: 0.654902, b: 0.56862, a: 1}
+    - _MajorLineForestColor: {r: 0.69803923, g: 0.7176471, b: 0.47843137, a: 1}
+    - _MajorLineGroundColor: {r: 0.76862746, g: 0.654902, b: 0.5686275, a: 1}
+    - _MajorLineWaterColor: {r: 0.5686275, g: 0.64705884, b: 0.7607843, a: 1}
+    - _MinorLineColor: {r: 0.86666673, g: 0.8117648, b: 0.76862, a: 1}
+    - _MinorLineForestColor: {r: 0.7490196, g: 0.79607844, b: 0.5764706, a: 1}
+    - _MinorLineGroundColor: {r: 0.87058824, g: 0.80784315, b: 0.75686276, a: 1}
+    - _MinorLineWaterColor: {r: 0.64705884, g: 0.7294118, b: 0.8392157, a: 1}
+    - _NonLineColor: {r: 0.96862745, g: 0.95686275, b: 0.9490196, a: 1}
+    - _WaterColor: {r: 0.7176471, g: 0.7960785, b: 0.90196, a: 1}
