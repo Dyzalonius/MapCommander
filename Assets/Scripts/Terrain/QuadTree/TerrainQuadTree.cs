@@ -189,7 +189,7 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
         Debug.Log("colormap done");
 
         // create new quadrants with new scale
-        minSize = QuadrantSize.p512;
+        minSize = QuadrantSize.p256;
         root = new Quadrant(maxSize, minSize, position);
 
         Debug.Log("quadrant creation done");
@@ -215,9 +215,7 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
 
     private void ShareTerrain()
     {
-        Debug.LogError("start sharing");
         SendTerrainData(root.colorMap, root.id);
-        Debug.LogError("finish sharing");
     }
 
     private void CreateTerrainData()
@@ -262,67 +260,51 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
 
     public void SendTerrainData(Color[] colorMap, string id)
     {
+        Debug.LogError("start sharing");
 
-        for (int i = 0; i < 128; i++)
+        byte[] terrainData = new byte[(int)minSize * (int)minSize * 2];
+
+        for (int i = 0; i < (int)minSize * (int)minSize; i++)
         {
-            string fileName = (id == "" ? "Quadrant" : "Quadrant_") + id + ".png" + " (" + i + ")";
-            byte[] terrainData = new byte[(int)minSize * 32 * 2];
-
-            for (int j = 0; j < (int)minSize * 32; j++)
-            {
-                terrainData[2 * j] = (byte)(colorMap[(128 * i) + j].r * 255);
-                terrainData[(2 * j) + 1] = (byte)(colorMap[(128 * i) + j].g * 255);
-            }
-
-            PhotonView photonView = PhotonView.Get(this);
-            photonView.RPC("ReceiveTerrainDataRPC", RpcTarget.Others, terrainData, fileName);
+            terrainData[2 * i] = (byte)(colorMap[i].r * 255);
+            terrainData[(2 * i) + 1] = (byte)(colorMap[i].g * 255);
         }
+
+        PhotonView photonView = PhotonView.Get(this);
+        photonView.RPC("ReceiveTerrainDataRPC", RpcTarget.AllViaServer, terrainData, id);
+
+        Debug.LogError("finish sharing");
     }
 
     [PunRPC]
-    public void ReceiveTerrainDataRPC(byte[] terrainData, string fileName, PhotonMessageInfo info)
+    public void ReceiveTerrainDataRPC(byte[] terrainData, string id, PhotonMessageInfo info)
     {
-        //Debug.LogError("start receiving");
+        Debug.LogError("start receiving");
+
         // Create color map using terrainData
-        Color[] colorMap = new Color[(int)minSize * 32];
-        for (int i = 0; i < (int)minSize * 32; i++)
+        Color[] colorMap = new Color[(int)minSize * (int)minSize];
+        for (int i = 0; i < (int)minSize * (int)minSize; i++)
         {
             Color color = new Color
             {
-                r = terrainData[2 * i],
-                g = terrainData[(2 * i) + 1],
+                r = ((float)terrainData[2 * i]) / 255,
+                g = ((float)terrainData[(2 * i) + 1]) / 255,
                 b = 0
             };
             colorMap[i] = color;
         }
-        //Debug.LogError("> colormap done");
-
-        // Create texture using color map
-        /*Texture2D texture = new Texture2D(Quadrant.textureSize, Quadrant.textureSize)
+        
+        Quadrant quadrant = root.FindQuadrantByID(id);
+        if (quadrant != null)
         {
-            filterMode = FilterMode.Point,
-            wrapMode = TextureWrapMode.Clamp
-        };
-        texture.SetPixels(colorMap);
-        texture.Apply();
-        Debug.LogError("> texture done");
+            quadrant.LoadTerrainFromArray(colorMap);
+        }
+        else
+        {
+            Debug.LogWarning("No quadrant found!");
+        }
 
-        // Create png using texture
-        byte[] bytes = texture.EncodeToPNG();
-        var dirPath = Application.dataPath + (Application.isEditor ? filepathPrefixInEditor : "") + filepathTerrainData;
-
-        if (!Directory.Exists(dirPath))
-            Directory.CreateDirectory(dirPath);
-
-        File.WriteAllBytes(dirPath + fileName, bytes);
-        Debug.LogError("> texture done");*/
-
-        //Debug.LogFormat("Info: {0} {1} {2}", info.Sender, info.photonView, info.SentServerTime);
-        //Debug.LogFormat("Difference = ", PhotonNetwork.Time - info.SentServerTimestamp);
-        Debug.LogError("finish receiving " + fileName);
-
-        //Temp
-        //LoadTerrain();
+        Debug.LogError("finish receiving " + id);
     }
 
     public void TryPaint(Vector2Int position, TerrainBrushMode mode)

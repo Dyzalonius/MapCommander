@@ -17,7 +17,6 @@ public class Game : MonoBehaviour
     [HideInInspector]
     public static Game Instance { get; private set; } // static singleton
 
-
     private void Awake()
     {
         if (Instance == null)

@@ -96,6 +96,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -153,7 +154,7 @@ MonoBehaviour:
   terrainPlanePrefab: {fileID: -8926171133896632547, guid: 01de7d1a189eb7045b836feb837d3398,
     type: 3}
   position: {x: 0, y: 0}
-  minSize: 512
+  minSize: 256
   maxSize: 8192
   loadType: 1
   filepathPrefixInEditor: /..
@@ -411,7 +412,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineMaterial: {fileID: 2100000, guid: 6b4e4c538be829e4792795e7ab8fb1be, type: 2}
   cam: {fileID: 519420031}
-  gridSize: 100000
   gridCellSize: 100
   gridPadding: {x: 12, y: 20}
   gridLevelColors:
@@ -518,7 +518,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52e87dfa53d00a646be45aa5ff533a3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cam: {fileID: 519420031}
   lineMaterial: {fileID: 2100000, guid: 91ee7fc8dcebd41429eaba935cf0b6c2, type: 2}
 --- !u!114 &519420036
 MonoBehaviour:
@@ -532,7 +531,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80257e86fb70cbe448cf0f89bd6b5b6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cam: {fileID: 519420031}
   lineMaterial: {fileID: 2100000, guid: 4cdf2ff3620f3c24c93a0eedda99fb39, type: 2}
   vertexCount: 48
 --- !u!1 &1578062413

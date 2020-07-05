@@ -1,5 +1,6 @@
 ﻿public enum QuadrantSize
 {
+    p256 = 256,
     p512 = 512,
     k1 = 1024,
     k2 = 2048,

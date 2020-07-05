@@ -123,6 +123,35 @@ public class Quadrant
         return quadrantsOfSize;
     }
 
+    public Quadrant FindQuadrantByID(string id)
+    {
+        if (this.id == id)
+        {
+            return this;
+        }
+        else
+        {
+            string subId = this.id;
+
+            if (bottomLeft != null && bottomLeft.IdStartsWithSubId(subId))
+                return bottomLeft.FindQuadrantByID(id);
+            if (bottomRight != null && bottomRight.IdStartsWithSubId(subId))
+                return bottomRight.FindQuadrantByID(id);
+            if (topLeft != null && topLeft.IdStartsWithSubId(subId))
+                return topLeft.FindQuadrantByID(id);
+            if (topRight != null && topRight.IdStartsWithSubId(subId))
+                return topRight.FindQuadrantByID(id);
+        }
+        return null;
+    }
+
+    public bool IdStartsWithSubId(string subId)
+    {
+        int subIdLength = subId.Length;
+
+        return id.Substring(0, subIdLength) == subId;
+    }
+
     public void GenerateTerrainData()
     {
         // Create noise map
@@ -269,6 +298,22 @@ public class Quadrant
             topLeft.LoadTerrainFromPNG(filePathBase);
         if (topRight != null)
             topRight.LoadTerrainFromPNG(filePathBase);
+    }
+
+    public void LoadTerrainFromArray(Color[] colorMap)
+    {
+        this.colorMap = colorMap;
+
+        if (colorMap != null && colorMap.Length > 0)
+        {
+            texture = new Texture2D(textureSize, textureSize)
+            {
+                filterMode = FilterMode.Point,
+                wrapMode = TextureWrapMode.Clamp
+            };
+            texture.SetPixels(colorMap);
+            texture.Apply();
+        }
     }
 
     public bool VisibleByMainCam()
