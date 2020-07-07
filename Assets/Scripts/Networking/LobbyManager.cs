@@ -53,14 +53,20 @@ public class LobbyManager : MonoBehaviour, IMatchmakingCallbacks, IInRoomCallbac
 
     public void OnLeftRoom() { }
 
-    public void OnMasterClientSwitched(Photon.Realtime.Player newMasterClient) { }
+    public void OnMasterClientSwitched(Photon.Realtime.Player newMasterClient)
+    {
+        Debug.LogError("MASTERCLIENT SWITCHED");
+    }
 
     public void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
     {
         clientList.UpdateList();
     }
 
-    public void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer) { }
+    public void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
+    {
+        Debug.LogError("A PLAYER LEFT THE ROOM");
+    }
 
     public void OnPlayerPropertiesUpdate(Photon.Realtime.Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
     {

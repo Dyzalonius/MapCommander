@@ -8,14 +8,17 @@ public class Quadrant
 {
     public Vector2Int position;
     public Vector2Int size; // Size of the quadrant, not size of the texture
+    public int textureSize;
     public string id;
+    public Texture2D texture; // Map data texture
     private Quadrant parent;
     private Quadrant bottomLeft;
     private Quadrant bottomRight;
     private Quadrant topLeft;
     private Quadrant topRight;
-    public Texture2D texture; // Map data texture
-    public int textureSize;
+    private bool isVisible;
+    private bool isLoaded;
+    private bool requested;
 
     private float[,] noiseMap;
     public Color[] colorMap;
@@ -131,7 +134,7 @@ public class Quadrant
         }
         else
         {
-            string subId = this.id;
+            string subId = id.Substring(0, this.id.Length + 1);
 
             if (bottomLeft != null && bottomLeft.IdStartsWithSubId(subId))
                 return bottomLeft.FindQuadrantByID(id);
@@ -288,6 +291,7 @@ public class Quadrant
         texture.LoadImage(fileData);
 
         this.texture = texture;
+        isLoaded = true;
         colorMap = texture.GetPixels();
 
         if (bottomLeft != null)
@@ -306,13 +310,16 @@ public class Quadrant
 
         if (colorMap != null && colorMap.Length > 0)
         {
-            texture = new Texture2D(textureSize, textureSize)
+            Texture2D texture = new Texture2D(textureSize, textureSize)
             {
                 filterMode = FilterMode.Point,
                 wrapMode = TextureWrapMode.Clamp
             };
             texture.SetPixels(colorMap);
             texture.Apply();
+
+            this.texture = texture;
+            isLoaded = true;
         }
     }
 
@@ -489,6 +496,18 @@ public class Quadrant
         for (int i = 0; i < globalPositions.Length; i++)
             globalPositions[i] = new Vector2Int(position.x + this.position.x, position.y + this.position.y);
         return globalPositions;
+    }
+
+    public void SetVisible(bool isVisible)
+    {
+        this.isVisible = isVisible;
+
+        // Request quadrant if visible and not loaded yet
+        if (this.isVisible && !isLoaded && !requested)
+        {
+            requested = true;
+            TerrainQuadTree.Instance.SendQuadrantRequest(id);
+        }
     }
 }
  

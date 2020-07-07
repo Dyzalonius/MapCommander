@@ -42,6 +42,7 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
     private List<TerrainTexture> terrainTexturePool;
     private Dictionary<Quadrant, TerrainTexture> visibleQuadrantPairs;
     private QuadrantSize visibleQuadrantScale;
+    private bool allowQuadrantRequests = true;
 
     private void Awake()
     {
@@ -80,6 +81,12 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
 
         if (Input.GetKeyDown(KeyCode.C))
             ConvertTerrainTo512();
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            allowQuadrantRequests = !allowQuadrantRequests;
+            Debug.LogError("AllowQuadrantRequests = " + allowQuadrantRequests);
+        }
     }
 
     public void BuildTree()
@@ -130,6 +137,7 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
             Quadrant quadrant = visibleQuadrants[i];
             if (!newActiveQuadrants.Contains(quadrant))
             {
+                quadrant.SetVisible(false);
                 TerrainTexture terrainTexture = visibleQuadrantPairs[quadrant];
                 terrainTexture.Deactivate();
                 visibleQuadrantPairs.Remove(quadrant);
@@ -140,8 +148,11 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
         // Activate new visible quadrants
         visibleQuadrants = newActiveQuadrants;
         foreach (Quadrant quadrant in visibleQuadrants)
+        {
             if (!visibleQuadrantPairs.ContainsKey(quadrant))
             {
+                quadrant.SetVisible(true);
+
                 // Only instantiate a new terrainTexture if the pool is empty
                 if (terrainTexturePool.Count == 0)
                     terrainTexturePool.Add(Instantiate(terrainPlanePrefab, transform));
@@ -152,6 +163,7 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
                 terrainTexture.Setup(quadrant, loadType != TerrainLoadType.NONE);
                 visibleQuadrantPairs.Add(quadrant, terrainTexture);
             }
+        }
     }
 
     private void UpdateQuadrantChanges()
@@ -256,6 +268,86 @@ public class TerrainQuadTree : MonoBehaviour//, IPunObservable
     {
         if (visibleQuadrantPairs.ContainsKey(quadrant))
             visibleQuadrantPairs[quadrant].UpdateTexture();
+    }
+
+    public void SendQuadrantRequest(string id)
+    {
+        if (!allowQuadrantRequests)
+        {
+            return;
+        }
+        Debug.LogError("SendQuadrantRequest " + id);
+
+        // Send RPC
+        PhotonView photonView = PhotonView.Get(this);
+        photonView.RPC("ReceiveQuadrantRequestRPC", RpcTarget.MasterClient, id);
+    }
+
+    [PunRPC]
+    public void ReceiveQuadrantRequestRPC(string id, PhotonMessageInfo info)
+    {
+        Debug.LogError("ReceiveQuadrantRequest " + id);
+        Quadrant quadrant = root.FindQuadrantByID(id);
+
+        // Exit if no quadrant found
+        if (quadrant == null)
+        {
+            Debug.LogWarning("No quadrant found of id " + id);
+            return;
+        }
+
+        SendQuadrant(quadrant, info.Sender);
+    }
+
+    public void SendQuadrant(Quadrant quadrant, Photon.Realtime.Player recipient)
+    {
+        // Exit if quadrant is null
+        if (quadrant == null || quadrant.colorMap == null)
+        {
+            Debug.LogWarning("Quadrant or it's colorMap is null!");
+            return;
+        }
+
+        Debug.LogError("SendQuadrant " + quadrant.id);
+
+        byte[] quadrantData = new byte[(int)minSize * (int)minSize * 2];
+        for (int i = 0; i < (int)minSize * (int)minSize; i++)
+        {
+            quadrantData[2 * i] = (byte)(quadrant.colorMap[i].r * 255);
+            quadrantData[(2 * i) + 1] = (byte)(quadrant.colorMap[i].g * 255);
+        }
+
+        // Send RPC
+        PhotonView photonView = PhotonView.Get(this);
+        photonView.RPC("ReceiveQuadrantRPC", recipient, quadrantData, quadrant.id);
+    }
+
+    [PunRPC]
+    public void ReceiveQuadrantRPC(byte[] quadrantData, string id, PhotonMessageInfo info)
+    {
+        Debug.LogError("ReceiveQuadrantRPC " + id);
+        // Create color map using quadrantData
+        Color[] colorMap = new Color[(int)minSize * (int)minSize];
+        for (int i = 0; i < (int)minSize * (int)minSize; i++)
+        {
+            Color color = new Color
+            {
+                r = ((float)quadrantData[2 * i]) / 255,
+                g = ((float)quadrantData[(2 * i) + 1]) / 255,
+                b = 0
+            };
+            colorMap[i] = color;
+        }
+
+        Quadrant quadrant = root.FindQuadrantByID(id);
+        if (quadrant != null)
+        {
+            quadrant.LoadTerrainFromArray(colorMap);
+        }
+        else
+        {
+            Debug.LogWarning("No quadrant found!");
+        }
     }
 
     public void SendTerrainData(Color[] colorMap, string id)
